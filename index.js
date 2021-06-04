@@ -72,6 +72,8 @@ app.use('/api/v1/review', reviewApi);
 app.use(notFound);
 app.use(errorHandler);
 
+console.log(PORT, 'PORT');
+
 app.listen(PORT, () => {
   consola.success(`Server running on port ${PORT}`);
 });
