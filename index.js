@@ -58,9 +58,10 @@ app.use(hpp());
 
 require('./middlewares/passport-middleware');
 
-app.use('/', (req, res) => {
-  res.json('HELLO');
+app.get('/', (req, res) => {
+  res.status(200).json({ message: 'Welcome to Node.js & Express' });
 });
+
 app.use('/api/v1/auth', authApi);
 app.use('/api/v1/users', userApi);
 app.use('/api/v1/products', productApi);
@@ -74,7 +75,7 @@ app.use(errorHandler);
 
 console.log(PORT, 'PORT');
 
-app.listen(PORT, () => {
+app.listen(PORT || 3000, () => {
   consola.success(`Server running on port ${PORT}`);
 });
 
