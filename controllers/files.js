@@ -8,7 +8,7 @@ const unlinkFile = util.promisify(fs.unlink);
 
 const uploadFiles = asyncHandler(async (req, res) => {
   const file = req.file;
-  console.log(file);
+  console.log(file, 'file');
 
   // apply filter
   // resize
