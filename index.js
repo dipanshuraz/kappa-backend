@@ -58,6 +58,9 @@ app.use(hpp());
 
 require('./middlewares/passport-middleware');
 
+app.use('/', (req, res) => {
+  res.json('HELLO');
+});
 app.use('/api/v1/auth', authApi);
 app.use('/api/v1/users', userApi);
 app.use('/api/v1/products', productApi);
