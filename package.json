@@ -1,0 +1,45 @@
+{
+  "name": "app_server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node -r esm",
+    "dev": "nodemon -r esm .",
+    "data:import": "nodemon -r esm seeder",
+    "data:destroy": "nodemon -r esm . seeder -d"
+  },
+  "author": "Deepanshu Prajapati",
+  "license": "MIT",
+  "dependencies": {
+    "@sendgrid/mail": "^7.4.4",
+    "aws-sdk": "^2.918.0",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.0",
+    "colors": "^1.4.0",
+    "consola": "^2.15.3",
+    "cookie-parser": "^1.4.5",
+    "cors": "^2.8.5",
+    "dotenv": "^9.0.2",
+    "esm": "^3.2.25",
+    "express": "^4.17.1",
+    "express-async-handler": "^1.1.4",
+    "express-mongo-sanitize": "^2.1.0",
+    "express-rate-limit": "^5.2.6",
+    "express-validator": "^6.11.1",
+    "helmet": "^4.6.0",
+    "hpp": "^0.2.3",
+    "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.21",
+    "mongoose": "^5.12.9",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.2",
+    "passport": "^0.4.1",
+    "passport-jwt": "^4.0.0",
+    "xss-clean": "^0.1.1"
+  },
+  "engines": {
+    "node": "10.x"
+  }
+}
