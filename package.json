@@ -39,9 +39,5 @@
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
     "xss-clean": "^0.1.1"
-  },
-  "engines": {
-    "node": ">=10.0.O",
-    "npm": ">=7.11.0"
   }
 }
