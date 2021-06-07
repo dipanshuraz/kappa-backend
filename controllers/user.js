@@ -39,8 +39,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
  * @type GET
  */
 const getUsers = asyncHandler(async (req, res) => {
-  const users = await User.find({});
-  res.json(users);
+  res.status(200).json(res.advancedResults);
 });
 
 /**

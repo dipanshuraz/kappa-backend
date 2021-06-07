@@ -11,7 +11,9 @@ import {
   updateUser,
 } from '../controllers/user';
 
-router.route('/').get(userAuth, getUsers);
+router
+  .route('/')
+  .get(advancedResults(Product), userAuth, authorize('admin'), getUsers);
 
 router.route('/profile').put(userAuth, authorize('user'), updateUserProfile);
 router

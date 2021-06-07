@@ -6,7 +6,7 @@ import {
   authenticateUser,
   authenticate,
   resetPassword,
-  //   resetPasswordToken,
+    // resetPasswordToken,
   resetPasswordNow,
 } from '../controllers/auth';
 
