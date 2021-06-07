@@ -10,7 +10,6 @@ import { uploadFileS3, getFileStreamS3, deleteFileS3 } from '../config/s3';
 const unlinkFile = util.promisify(fs.unlink);
 
 const uploadFiles = (req, res) => {
-  console.log(req.params, 'paams');
   let array = [];
   async.series(
     [
@@ -49,6 +48,7 @@ const uploadFiles = (req, res) => {
               cb(err);
               return;
             }
+
             product.images = array;
             product.save((err, doc) => {
               if (err) {
@@ -74,7 +74,6 @@ const uploadFiles = (req, res) => {
 };
 
 const getFile = (req, res) => {
-  console.log(req.params);
   const key = req.params.key;
   const readStream = getFileStreamS3(key);
 
@@ -82,24 +81,20 @@ const getFile = (req, res) => {
 };
 
 const deleteFile = asyncHandler(async (req, res) => {
-  console.log(req.params, 'params for delete');
   const key = req.params.key;
   const result = await deleteFileS3(key);
 
-  console.log(result, 'result delete');
   res.send({ success: true });
 });
 
 const uploadSingleFile = asyncHandler(async (req, res) => {
   const file = req.file;
-  console.log(file, 'file');
 
   // apply filter
   // resize
 
   const result = await uploadFileS3(file);
   await unlinkFile(file.path);
-  console.log(result);
 
   res.send({ imagePath: result.Key });
 });
