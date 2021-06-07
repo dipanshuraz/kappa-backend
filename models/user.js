@@ -20,6 +20,16 @@ const UserSchema = new Schema(
       enum: ['user', 'admin'],
       default: 'user',
     },
+    shippingAddress: [
+      {
+        address: { type: String, required: true },
+        city: { type: String, required: true },
+        state: { type: String, required: true },
+        postalCode: { type: String, required: true },
+        country: { type: String, required: true },
+        default: { type: Boolean, default: false },
+      },
+    ],
   },
   {
     timestamps: true,

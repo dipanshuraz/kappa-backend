@@ -1,24 +1,74 @@
+import async from 'async';
 import asyncHandler from 'express-async-handler';
 import fs from 'fs';
 import util from 'util';
+import { Product } from '../models';
 
 import { uploadFileS3, getFileStreamS3, deleteFileS3 } from '../config/s3';
 
 const unlinkFile = util.promisify(fs.unlink);
 
-const uploadFiles = asyncHandler(async (req, res) => {
-  const file = req.file;
-  console.log(file, 'file');
+const uploadFiles = (req, res) => {
+  console.log(req.params, 'paams');
+  let array = [];
+  async.series(
+    [
+      (cb) => {
+        if (req.files && req.files.length) {
+          async.eachSeries(
+            req.files,
+            (file, callback) => {
+              uploadFileS3(file)
+                .then((res) => {
+                  array.push(res.key);
+                  unlinkFile(file.path);
+                  callback();
+                })
+                .catch((err) => {
+                  callback(err);
+                  return;
+                });
+            },
+            (err) => {
+              if (err) {
+                cb(err);
+                return;
+              }
+              cb();
+            }
+          );
+        } else {
+          res.json({ success: true, files: [] });
+        }
+      },
+      (cb) => {
+        Product.findById(req.params.id).exec((err, product) => {
+          if (err) {
+            cb(err);
+            return;
+          }
+          product.images = array;
+          product.save((err, doc) => {
+            if (err) {
+              cb(err);
+              return;
+            }
+            req.product = doc;
+            cb();
+          });
+        });
+      },
+    ],
+    (err) => {
+      if (err) {
+        res.json({ success: false, err });
+        return;
+      }
 
-  // apply filter
-  // resize
-
-  const result = await uploadFileS3(file);
-  await unlinkFile(file.path);
-  console.log(result);
-  const description = req.body.description;
-  res.send({ imagePath: `/images/${result.Key}` });
-});
+      res.json({ success: true, files: array, product: req.product });
+    }
+  );
+};
 
 const getFile = (req, res) => {
   console.log(req.params);
@@ -39,7 +89,7 @@ const deleteFile = asyncHandler(async (req, res) => {
 
 const uploadSingleFile = asyncHandler(async (req, res) => {
   const file = req.file;
-  console.log(file);
+  console.log(file, 'file');
 
   // apply filter
   // resize
@@ -47,8 +97,8 @@ const uploadSingleFile = asyncHandler(async (req, res) => {
   const result = await uploadFileS3(file);
   await unlinkFile(file.path);
   console.log(result);
-  const description = req.body.description;
-  res.send({ imagePath: `/images/${result.Key}` });
+
+  res.send({ imagePath: result.Key });
 });
 
 export { uploadFiles, getFile, deleteFile, uploadSingleFile };

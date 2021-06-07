@@ -39,8 +39,6 @@ const deleteFileS3 = (fileKey) => {
     Bucket: bucketName,
   };
 
-  console.log('delete start');
-
   return s3.deleteObject(params).promise();
 };
 

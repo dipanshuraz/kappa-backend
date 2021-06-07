@@ -95,8 +95,9 @@ const updateReview = asyncHandler(async (req, res, next) => {
 
   if (!findReview && req.user.role !== 'admin') {
     res.status(400);
-    throw new Erro('Not authorized to update this review');
+    throw new Error('Not authorized to update this review');
   }
+
   const editReview = await Review.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,

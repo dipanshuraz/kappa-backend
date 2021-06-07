@@ -23,6 +23,8 @@ import orderApi from './routes/order';
 import categoryApi from './routes/category';
 import filesApi from './routes/files';
 import reviewApi from './routes/review';
+import cartApi from './routes/cart';
+import wishlistApi from './routes/wishlist';
 
 const app = express();
 
@@ -69,6 +71,8 @@ app.use('/api/v1/order', orderApi);
 app.use('/api/v1/categories', categoryApi);
 app.use('/api/v1/files', filesApi);
 app.use('/api/v1/review', reviewApi);
+app.use('/api/v1/cart', cartApi);
+app.use('/api/v1/wishlist', wishlistApi);
 
 app.use(notFound);
 app.use(errorHandler);
@@ -79,7 +83,9 @@ app.listen(PORT || 3000, () => {
   consola.success(`Server running on port ${PORT}`);
 });
 
+// Handle unhandled promise rejections
 process.on('unhandledRejection', (err, promise) => {
-  console.log(`Error: ${err.message}`);
-  server.close(() => process.exit(1));
+  console.log(`Error: ${err.message}`.red);
+  // Close server & exit process
+  // server.close(() => process.exit(1));
 });
