@@ -23,8 +23,8 @@ import orderApi from './routes/order';
 import categoryApi from './routes/category';
 import filesApi from './routes/files';
 import reviewApi from './routes/review';
-import cartApi from './routes/cart';
-import wishlistApi from './routes/wishlist';
+// import cartApi from './routes/cart';
+// import wishlistApi from './routes/wishlist';
 
 const app = express();
 
@@ -71,8 +71,8 @@ app.use('/api/v1/order', orderApi);
 app.use('/api/v1/categories', categoryApi);
 app.use('/api/v1/files', filesApi);
 app.use('/api/v1/review', reviewApi);
-app.use('/api/v1/cart', cartApi);
-app.use('/api/v1/wishlist', wishlistApi);
+// app.use('/api/v1/cart', cartApi);
+// app.use('/api/v1/wishlist', wishlistApi);
 
 app.use(notFound);
 app.use(errorHandler);
