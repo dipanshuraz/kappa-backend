@@ -3,6 +3,7 @@ import asyncHandler from 'express-async-handler';
 import fs from 'fs';
 import util from 'util';
 import { Product } from '../models';
+import mongoose from 'mongoose';
 
 import { uploadFileS3, getFileStreamS3, deleteFileS3 } from '../config/s3';
 
@@ -42,21 +43,23 @@ const uploadFiles = (req, res) => {
         }
       },
       (cb) => {
-        Product.findById(req.params.id).exec((err, product) => {
-          if (err) {
-            cb(err);
-            return;
-          }
-          product.images = array;
-          product.save((err, doc) => {
+        Product.findOne({ _id: mongoose.Types.ObjectId(req.params.id) }).exec(
+          (err, product) => {
             if (err) {
               cb(err);
               return;
             }
-            req.product = doc;
-            cb();
-          });
-        });
+            product.images = array;
+            product.save((err, doc) => {
+              if (err) {
+                cb(err);
+                return;
+              }
+              req.product = doc;
+              cb();
+            });
+          }
+        );
       },
     ],
     (err) => {
