@@ -6,11 +6,8 @@ import { advancedResults } from '../middlewares/advancedResults';
 const { Cart } = require('../models/');
 import { userAuth } from '../middlewares/auth-guard';
 
-router.route('/').get(userAuth, advancedResults(Cart), getCart);
+router.route('/').get(advancedResults(Cart), getCart);
 
-router
-  .route('/:product')
-  .post(userAuth, addToCart)
-  .delete(userAuth, removeFromCart);
+router.route('/:product').post(addToCart).delete(removeFromCart);
 
 export default router;

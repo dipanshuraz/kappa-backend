@@ -15,12 +15,12 @@ import { userAuth, authorize } from '../middlewares/auth-guard';
 router
   .route('/')
   .get(advancedResults(Category), getCategories)
-  .post(userAuth, authorize('admin'), addCategory);
+  .post(addCategory);
 
 router
   .route('/:categoryId')
-  .get(userAuth, authorize('admin'), getCategory)
-  .put(userAuth, authorize('admin'), updateCategory)
-  .delete(userAuth, authorize('admin'), removeCategory);
+  .get(getCategory)
+  .put(updateCategory)
+  .delete(removeCategory);
 
 export default router;

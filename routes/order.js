@@ -11,10 +11,10 @@ import express from 'express';
 const router = express.Router();
 import { userAuth } from '../middlewares/auth-guard';
 
-router.route('/').post(userAuth, addOrderItems).get(userAuth, getOrders);
-router.route('/myorders').get(userAuth, getMyOrders);
-router.route('/:id').get(userAuth, getOrderById);
-router.route('/:id/pay').put(userAuth, updateOrderToPaid);
-router.route('/:id/deliver').put(userAuth, updateOrderToDelivered);
+router.route('/').post(addOrderItems).get(getOrders);
+router.route('/myorders').get(getMyOrders);
+router.route('/:id').get(getOrderById);
+router.route('/:id/pay').put(updateOrderToPaid);
+router.route('/:id/deliver').put(updateOrderToDelivered);
 
 export default router;
