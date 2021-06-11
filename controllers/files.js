@@ -21,7 +21,7 @@ const uploadFiles = (req, res) => {
               uploadFileS3(file)
                 .then((res) => {
                   console.log(file, 'file');
-                  console.log(res.key, 'res.key');
+                  console.log(res.key,'res.key')
                   array.push(res.key);
                   unlinkFile(file.path);
                   callback();

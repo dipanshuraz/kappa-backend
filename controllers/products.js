@@ -1,6 +1,11 @@
 import asyncHandler from 'express-async-handler';
 import { Product } from '../models';
 import mongoose from 'mongoose';
+import async from 'async';
+import fs from 'fs';
+import util from 'util';
+import { uploadFileS3, getFileStreamS3, deleteFileS3 } from '../config/s3';
+const unlinkFile = util.promisify(fs.unlink);
 
 /**
  * @description Fetch all products
@@ -40,6 +45,7 @@ const getProducts = asyncHandler(async (req, res) => {
  * @type GET
  */
 const getProductById = asyncHandler(async (req, res) => {
+  console.log(req.params.id, 'req.params.id');
   const product = await Product.findById(req.params.id);
 
   if (product) {
@@ -77,8 +83,8 @@ const deleteProduct = asyncHandler(async (req, res) => {
 
 const createProduct = asyncHandler(async (req, res) => {
   console.log(req.files, 'files');
-  console.log(req.body, 'body');
-
+  console.log(JSON.parse(req.body.data), 'body');
+  let formData = JSON.parse(req.body.data);
   const {
     user,
     title,
@@ -88,20 +94,77 @@ const createProduct = asyncHandler(async (req, res) => {
     discount,
     category,
     countInStock,
-  } = req.body;
+  } = formData;
 
-  const product = new Product();
-  product.title = title;
-  product.price = price;
-  product.discount = discount;
-  product.user = mongoose.Types.ObjectId(user);
-  product.images = images;
-  product.category = mongoose.Types.ObjectId(category);
-  product.countInStock = countInStock;
-  product.description = description;
+  let array = [];
+  async.series(
+    [
+      (cb) => {
+        const product = new Product();
+        product.title = title;
+        product.price = price;
+        product.discount = discount;
+        product.user = mongoose.Types.ObjectId(user);
+        product.images = images;
+        product.category = mongoose.Types.ObjectId(category);
+        product.countInStock = countInStock;
+        product.description = description;
 
-  // const createdProduct = await product.save();
-  res.status(201).json(createdProduct);
+        product.save((err, product) => {
+          if (err) {
+            cb(err);
+          }
+          // console.log(product, 'product');
+          req.product = product;
+          cb();
+        });
+      },
+      (cb) => {
+        if (req.files && req.files.length) {
+          async.eachSeries(
+            req.files,
+            (file, callback) => {
+              uploadFileS3(file)
+                .then((res) => {
+                  array.push(res.key);
+                  unlinkFile(file.path);
+                  callback();
+                })
+                .catch((err) => {
+                  callback(err);
+                  console.log('in erro', err);
+                  return;
+                });
+            },
+            (err) => {
+              if (err) {
+                console.log('in erro2', err);
+                cb(err);
+                return;
+              }
+              req.product.images = array;
+              req.product.save((err, product) => {
+                if (err) {
+                  cb(err);
+                }
+                console.log('qwertyui');
+                cb();
+              });
+            }
+          );
+        } else {
+          cb();
+        }
+      },
+    ],
+    (err) => {
+      if (err) {
+        res.json({ success: false, err });
+        return;
+      }
+      res.status(201).json({ product: req.product });
+    }
+  );
 });
 
 /**
@@ -112,27 +175,128 @@ const createProduct = asyncHandler(async (req, res) => {
  */
 
 const updateProduct = asyncHandler(async (req, res) => {
-  const { title, price, discount, description, category, countInStock } =
-    req.body;
+  console.log(req.files, 'files');
+  console.log(JSON.parse(req.body.data), 'body');
+  let formData = JSON.parse(req.body.data);
+  const {
+    user,
+    title,
+    price,
+    images,
+    description,
+    discount,
+    category,
+    countInStock,
+  } = formData;
 
-  const product = await Product.findById(req.params.id);
+  let array = [];
+  async.series(
+    [
+      (cb) => {
+        Product.findOne({ _id: mongoose.Types.ObjectId(req.params.id) }).exec(
+          (err, product) => {
+            if (err) {
+              cb(err);
+              return;
+            }
 
-  if (product) {
-    product.title = title;
-    product.price = price;
-    product.description = description;
-    // product.image = image;
-    product.discount = discount;
-    product.category = category;
-    product.countInStock = countInStock;
+            if (product) {
+              product.title = title;
+              product.price = price;
+              product.description = description;
+              product.discount = discount;
+              product.category = category;
+              product.countInStock = countInStock;
+              product.save((err, doc) => {
+                if (err) {
+                  cb(err);
+                  return;
+                }
+                req.product = doc;
+                cb();
+              });
+            } else {
+              cb();
+            }
+          }
+        );
+      },
+      (cb) => {
+        if (req.files && req.files.length) {
+          async.eachSeries(
+            req.files,
+            (file, callback) => {
+              uploadFileS3(file)
+                .then((res) => {
+                  array.push(res.key);
+                  unlinkFile(file.path);
+                  callback();
+                })
+                .catch((err) => {
+                  callback(err);
+                  console.log('in erro', err);
+                  return;
+                });
+            },
+            (err) => {
+              if (err) {
+                console.log('in erro2', err);
+                cb(err);
+                return;
+              }
 
-    const updatedProduct = await product.save();
-    res.json(updatedProduct);
-  } else {
-    res.status(404);
-    throw new Error('Product not found');
-  }
+              if (array && array.length) {
+                array.forEach((img) => {
+                  req.product.images.push(img);
+                });
+              }
+
+              req.product.save((err, product) => {
+                if (err) {
+                  cb(err);
+                }
+                console.log('qwertyui');
+                cb();
+              });
+            }
+          );
+        } else {
+          cb();
+        }
+      },
+    ],
+    (err) => {
+      if (err) {
+        res.json({ success: false, err });
+        return;
+      }
+      res.status(201).json({ product: req.product });
+    }
+  );
 });
+
+// const updateProduct = asyncHandler(async (req, res) => {
+//   const { title, price, discount, description, category, countInStock } =
+//     req.body;
+
+//   const product = await Product.findById(req.params.id);
+
+//   if (product) {
+//     product.title = title;
+//     product.price = price;
+//     product.description = description;
+//     // product.image = image;
+//     product.discount = discount;
+//     product.category = category;
+//     product.countInStock = countInStock;
+
+//     const updatedProduct = await product.save();
+//     res.json(updatedProduct);
+//   } else {
+//     res.status(404);
+//     throw new Error('Product not found');
+//   }
+// });
 
 /**
  * @description Create new review

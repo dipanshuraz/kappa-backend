@@ -13,6 +13,7 @@ const router = express.Router();
 import { Product } from '../models';
 import { advancedResults } from '../middlewares/advancedResults';
 import { userAuth, authorize } from '../middlewares/auth-guard';
+let upload = require('../config/multer');
 
 // protect, admin,
 router
@@ -24,13 +25,13 @@ router
     }),
     getProducts
   )
-  .post(createProduct);
+  .post(upload.any(), createProduct);
 
 router.get('/top', getTopProducts);
 router
   .route('/:id')
-  .get(userAuth, authorize('admin'), getProductById)
-  .delete(userAuth, authorize('admin'), deleteProduct)
-  .put(userAuth, authorize('admin'), updateProduct);
+  .get(getProductById)
+  .delete(deleteProduct)
+  .put(upload.any(), updateProduct);
 
 export default router;
