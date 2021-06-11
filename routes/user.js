@@ -2,6 +2,8 @@ import express from 'express';
 const router = express.Router();
 
 import { userAuth, authorize } from '../middlewares/auth-guard';
+import { advancedResults } from '../middlewares/advancedResults';
+import { Product } from '../models';
 
 import {
   updateUserProfile,

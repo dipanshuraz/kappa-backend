@@ -76,6 +76,9 @@ const deleteProduct = asyncHandler(async (req, res) => {
  */
 
 const createProduct = asyncHandler(async (req, res) => {
+  console.log(req.files, 'files');
+  console.log(req.body, 'body');
+
   const {
     user,
     title,
@@ -97,7 +100,7 @@ const createProduct = asyncHandler(async (req, res) => {
   product.countInStock = countInStock;
   product.description = description;
 
-  const createdProduct = await product.save();
+  // const createdProduct = await product.save();
   res.status(201).json(createdProduct);
 });
 
