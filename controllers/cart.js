@@ -1,5 +1,6 @@
 import asyncHandler from 'express-async-handler';
-import { Category } from '../models';
+import mongoose from 'mongoose';
+import { Cart } from '../models';
 
 /**
  * @description get all categories
@@ -12,6 +13,24 @@ const getCart = asyncHandler(async (req, res, next) => {
   res.status(200).json({ data: res.advancedResults });
 });
 
+const getSingleCart = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+  console.log(id, 'req.params.id');
+
+  const cart = await Cart.findOne({
+    user: mongoose.Types.ObjectId(id),
+  }).populate('items.product');
+
+  console.log(cart, 'cart');
+
+  if (cart) {
+    res.status(200).json(cart);
+  } else {
+    res.status(404);
+    throw new Error('Cart not found');
+  }
+});
+
 /**
  * @description Create a category
  * @api /api/v1/category
@@ -20,23 +39,38 @@ const getCart = asyncHandler(async (req, res, next) => {
  */
 
 const addToCart = asyncHandler(async (req, res, next) => {
-  let categoryName = req.body;
   console.log(req.body, 'req.body');
-  categoryName = categoryName.categoryName.toLowerCase();
-  console.log(categoryName, 'req.body');
 
-  let category = await Category.findOne({ categoryName });
+  let cart = await Cart.findOne({ user: req.body.user });
 
-  console.log(category, 'category');
-
-  if (category) {
-    res.status(404);
-    throw new Error(`Category already exists ${categoryName}`);
+  if (cart) {
+    req.body.items.forEach((item) => {
+      if (cart.items && cart.items.length) {
+        cart.items.forEach((cartItem) => {
+          if (cartItem.product.toString() === item.product.toString()) {
+            cartItem.quantity += item.quantity;
+          } else {
+            cart.items.push(item);
+          }
+        });
+      } else {
+        cart.items = req.body.items;
+      }
+    });
   } else {
-    category = await Category.create({ categoryName });
-    res.status(201).send({ status: 'success', data: category });
+    cart = await Cart.create({ user: req.body.user });
+    cart.items = req.body.items;
   }
+
+  await cart.save();
+  res.status(200).json(cart);
 });
+
+[
+  { product: '60c4755ae578cd18633423b5', quantity: 3 },
+  { product: '60c4755ae578cd18633423b5', quantity: 3 },
+  { product: '60c4755ae578cd18633423b5', quantity: 3 },
+];
 
 /**
  * @description delete a category
@@ -46,29 +80,65 @@ const addToCart = asyncHandler(async (req, res, next) => {
  */
 
 const removeFromCart = asyncHandler(async (req, res, next) => {
-  const findCategory = await Category.findByIdAndDelete(req.params.categoryId);
+  req.body.user = '60b91c696807c4197c691213';
+  let cart = await Cart.findOne({ user: req.body.user });
+  const { id } = req.params;
 
-  if (!findCategory) {
+  if (!cart) {
     res.status(404);
-    throw new Error(
-      `Category is not found with id of ${req.params.categoryId}`
-    );
+    throw new Error(`Cart is not found with this user.`);
   }
 
-  res
-    .status(200)
-    .json({ status: 'success', message: 'Category Deleted Successfully' });
+  let result = cart.items.filter((elem) => elem._id.toString() !== id);
+
+  cart.items = result;
+  await cart.save();
+
+  res.status(200).json({ status: 'success', cart });
+});
+
+const updateItem = asyncHandler(async (req, res) => {
+  const { itemId, type } = req.body;
+  let cart = await Cart.findOne({ user: req.body.user });
+
+  if (!cart) {
+    res.status(404);
+    throw new Error(`Cart is not found with this user.`);
+  }
+
+  cart.items.forEach((elem) => {
+    if (elem._id.toString() === itemId) {
+      switch (type) {
+        case 'inc':
+          elem.quantity += 1;
+          break;
+        case 'dec':
+          elem.quantity -= 1;
+          break;
+        default:
+          elem.quantity;
+      }
+    }
+    return elem;
+  });
+
+  await cart.save();
+
+  res.status(200).json({ status: 'success', cart });
 });
 
 module.exports = {
-  getCategories,
-  getCategory,
-  addCategory,
-  updateCategory,
-  removeCategory,
+  getCart,
+  getSingleCart,
+  addToCart,
+  removeFromCart,
+  updateItem,
 };
 
-if (!findReview && req.user.role !== 'admin') {
-  res.status(400);
-  throw new Error('Not authorized to update this review');
-}
+// if (!findReview && req.user.role !== 'admin') {
+//   res.status(400);
+//   throw new Error('Not authorized to update this review');
+// }
+
+// initialize empty cart on user creation
+// empty after each order

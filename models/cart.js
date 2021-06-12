@@ -7,10 +7,6 @@ const CartSchema = new Schema(
       required: true,
       ref: 'User',
     },
-    price: {
-      type: Number,
-      default: 0,
-    },
 
     items: [
       {
@@ -18,7 +14,10 @@ const CartSchema = new Schema(
           type: Schema.Types.ObjectId,
           ref: 'Product',
         },
-        quantity: Number,
+        quantity: {
+          type: Number,
+          default: 0,
+        },
       },
     ],
   },

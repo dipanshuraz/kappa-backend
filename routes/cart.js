@@ -1,13 +1,23 @@
-const { getCart, addToCart, removeFromCart } = require('../controllers/cart');
+const {
+  getCart,
+  getSingleCart,
+  addToCart,
+  removeFromCart,
+  updateItem,
+} = require('../controllers/cart');
 
 const router = require('express').Router();
 import { advancedResults } from '../middlewares/advancedResults';
 
 const { Cart } = require('../models/');
-import { userAuth } from '../middlewares/auth-guard';
+// import { userAuth } from '../middlewares/auth-guard';
 
-router.route('/').get(advancedResults(Cart), getCart);
+router
+  .route('/')
+  .get(advancedResults(Cart), getCart)
+  .post(addToCart)
+  .put(updateItem);
 
-router.route('/:product').post(addToCart).delete(removeFromCart);
+router.route('/:id').get(getSingleCart).put(removeFromCart);
 
 export default router;

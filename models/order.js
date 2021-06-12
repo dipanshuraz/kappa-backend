@@ -24,7 +24,6 @@ const orderSchema = Schema(
     },
     paymentMethod: {
       type: String,
-      required: true,
     },
     paymentResult: {
       id: { type: String },

@@ -23,7 +23,8 @@ import orderApi from './routes/order';
 import categoryApi from './routes/category';
 import filesApi from './routes/files';
 import reviewApi from './routes/review';
-// import cartApi from './routes/cart';
+import cartApi from './routes/cart';
+import addressApi from './routes/address';
 // import wishlistApi from './routes/wishlist';
 
 const app = express();
@@ -49,11 +50,11 @@ app.use(helmet());
 app.use(xss());
 
 // Rate limiting
-const limiter = rateLimit({
-  windowMs: 10 * 60 * 1000, // 10 mins
-  max: 100,
-});
-app.use(limiter);
+// const limiter = rateLimit({
+//   windowMs: 10 * 60 * 1000, // 10 mins
+//   max: 100,
+// });
+// app.use(limiter);
 
 // Prevent http param pollution
 app.use(hpp());
@@ -71,7 +72,8 @@ app.use('/api/v1/order', orderApi);
 app.use('/api/v1/categories', categoryApi);
 app.use('/api/v1/files', filesApi);
 app.use('/api/v1/review', reviewApi);
-// app.use('/api/v1/cart', cartApi);
+app.use('/api/v1/cart', cartApi);
+app.use('/api/v1/address', addressApi);
 // app.use('/api/v1/wishlist', wishlistApi);
 
 app.use(notFound);
