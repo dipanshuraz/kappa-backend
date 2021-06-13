@@ -20,8 +20,8 @@ router
   .route('/')
   .get(
     advancedResults(Product, {
-      path: 'Reviews',
-      select: 'title',
+      path: 'category',
+      select: 'categoryName',
     }),
     getProducts
   )

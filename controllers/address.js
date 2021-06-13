@@ -9,13 +9,33 @@ import asyncHandler from 'express-async-handler';
  */
 
 const getAddresses = asyncHandler(async (req, res) => {
-  console.log(req.user, 'enter in address');
-  const user = await User.findById(req.user._id);
+  let id;
+  if (req.user) {
+    id = req.user._id;
+  } else {
+    id = '60b91c696807c4197c691214';
+  }
+  const user = await User.findById(id);
   res.status(200).json({ shippingAddress: user.shippingAddress });
 });
 
 const addAddress = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user._id);
+  console.log('enter in address');
+
+  let id;
+  if (req.user) {
+    id = req.user._id;
+  } else {
+    id = '60b91c696807c4197c691214';
+  }
+
+  console.log(id, 'id');
+
+  // mongoose.Types.ObjectId()
+  const user = await User.findById(id);
+
+  console.log(user, 'user');
+
   if (req.body.default) {
     user.shippingAddress.forEach((elem) => {
       elem.default = false;
@@ -35,10 +55,17 @@ const addAddress = asyncHandler(async (req, res) => {
 });
 
 const updateAddress = asyncHandler(async (req, res) => {
-  console.log(req.params, 'hello', req.user, 'req.user');
+  console.log(req.params, 'hello', req.body, 'req.user');
 
-  const user = await User.findById(req.user._id);
+  let userId;
+  if (req.user) {
+    userId = req.user._id;
+  } else {
+    userId = '60b91c696807c4197c691214';
+  }
+
   const { id } = req.params;
+
   const {
     address,
     city,
@@ -48,14 +75,18 @@ const updateAddress = asyncHandler(async (req, res) => {
     default: makeDefault,
   } = req.body;
 
+  console.log(id, 'id');
+
+  const user = await User.findById(userId);
+
   if (makeDefault) {
-    user.shippingAddress.forEach((elem) => {
-      elem.default = false;
-    });
+    user.shippingAddress.forEach((elem) => (elem.default = false));
   }
 
   user.shippingAddress.forEach((item) => {
-    if (item._id.toString() === id) {
+    console.log(item._id, 'item', id, 'id');
+    if (item._id.toString() === id.toString()) {
+      console.log(id, 'object');
       (item.address = address),
         (item.city = city),
         (item.state = state),
@@ -63,11 +94,13 @@ const updateAddress = asyncHandler(async (req, res) => {
         (item.postalCode = postalCode),
         (item.default = makeDefault);
     }
+    return item;
   });
 
   let result = user.shippingAddress.filter((elem) => elem.default === false);
 
   if (result && result.length === user.shippingAddress.length) {
+    console.log('asdfghj');
     user.shippingAddress[0].default = true;
   }
 

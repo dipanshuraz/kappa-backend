@@ -12,11 +12,8 @@ import {
   deleteAddress,
 } from '../controllers/address';
 
-router.route('/').get(userAuth, getAddresses).post(userAuth, addAddress);
+router.route('/').get(getAddresses).post(addAddress);
 
-router
-  .route('/:id')
-  .put(userAuth, updateAddress)
-  .delete(userAuth, deleteAddress);
+router.route('/:id').put(updateAddress).delete(deleteAddress);
 
 export default router;

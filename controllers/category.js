@@ -9,8 +9,6 @@ import { Category } from '../models';
  */
 
 const getCategories = asyncHandler(async (req, res, next) => {
-  console.log('hello');
-
   res.status(200).json({ data: res.advancedResults });
 });
 
