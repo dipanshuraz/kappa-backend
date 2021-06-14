@@ -76,6 +76,10 @@ app.use('/api/v1/cart', cartApi);
 app.use('/api/v1/address', addressApi);
 // app.use('/api/v1/wishlist', wishlistApi);
 
+app.get('/api/v1/config/paypal', (req, res) => {
+  res.send(process.env.PAYPAL_CLIENT_ID);
+});
+
 app.use(notFound);
 app.use(errorHandler);
 

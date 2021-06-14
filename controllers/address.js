@@ -109,7 +109,16 @@ const updateAddress = asyncHandler(async (req, res) => {
 });
 
 const deleteAddress = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user._id);
+  console.log('enter in delete address');
+
+  let userId;
+  if (req.user) {
+    userId = req.user._id;
+  } else {
+    userId = '60b91c696807c4197c691214';
+  }
+
+  const user = await User.findById(userId);
   const { id } = req.params;
 
   let addresses = user.shippingAddress.filter((elem) => {
@@ -118,11 +127,14 @@ const deleteAddress = asyncHandler(async (req, res) => {
 
   user.shippingAddress = addresses;
 
-  let result = user.shippingAddress.filter((elem) => elem.default === false);
+  if (user.shippingAddress && user.shippingAddress.length > 0) {
+    let result = user.shippingAddress.filter((elem) => elem.default === false);
 
-  if (result && result.length === user.shippingAddress.length) {
-    user.shippingAddress[0].default = true;
+    if (result && result.length === user.shippingAddress.length) {
+      user.shippingAddress[0].default = true;
+    }
   }
+
   await user.save();
   res.status(200).json({ shippingAddress: user.shippingAddress });
 });

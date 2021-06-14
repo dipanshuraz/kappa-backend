@@ -19,7 +19,13 @@ const getSingleCart = asyncHandler(async (req, res, next) => {
 
   const cart = await Cart.findOne({
     user: mongoose.Types.ObjectId(id),
-  }).populate('items.product');
+  }).populate({
+    path: 'items.product',
+    populate: {
+      path: 'category',
+      model: 'Category',
+    },
+  });
 
   console.log(cart, 'cart');
 
@@ -40,37 +46,30 @@ const getSingleCart = asyncHandler(async (req, res, next) => {
 
 const addToCart = asyncHandler(async (req, res, next) => {
   console.log(req.body, 'req.body');
+  const { item } = req.body;
 
   let cart = await Cart.findOne({ user: req.body.user });
 
   if (cart) {
-    req.body.items.forEach((item) => {
-      if (cart.items && cart.items.length) {
-        cart.items.forEach((cartItem) => {
-          if (cartItem.product.toString() === item.product.toString()) {
-            cartItem.quantity += item.quantity;
-          } else {
-            cart.items.push(item);
-          }
-        });
-      } else {
-        cart.items = req.body.items;
-      }
-    });
+    if (cart.items && cart.items.length) {
+      cart.items.forEach((cartItem) => {
+        if (cartItem.product.toString() === item.product.toString()) {
+          cartItem.quantity += item.quantity;
+        } else {
+          cart.items.push(item);
+        }
+      });
+    } else {
+      cart.items.push(item);
+    }
   } else {
     cart = await Cart.create({ user: req.body.user });
-    cart.items = req.body.items;
+    cart.items.push(item);
   }
 
   await cart.save();
   res.status(200).json(cart);
 });
-
-[
-  { product: '60c4755ae578cd18633423b5', quantity: 3 },
-  { product: '60c4755ae578cd18633423b5', quantity: 3 },
-  { product: '60c4755ae578cd18633423b5', quantity: 3 },
-];
 
 /**
  * @description delete a category
@@ -80,8 +79,20 @@ const addToCart = asyncHandler(async (req, res, next) => {
  */
 
 const removeFromCart = asyncHandler(async (req, res, next) => {
-  req.body.user = '60b91c696807c4197c691213';
-  let cart = await Cart.findOne({ user: req.body.user });
+  req.body.user = '60b91c696807c4197c691214';
+
+  const cart = await Cart.findOne({
+    user: mongoose.Types.ObjectId(req.body.user),
+  }).populate({
+    path: 'items.product',
+    populate: {
+      path: 'category',
+      model: 'Category',
+    },
+  });
+
+  console.log(cart, 'cart in backnd');
+
   const { id } = req.params;
 
   if (!cart) {

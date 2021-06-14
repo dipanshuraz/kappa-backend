@@ -78,7 +78,7 @@ const advancedResults = (model, populate) => async (req, res, next) => {
     total,
   };
 
-  console.log(res.advancedResults, 'res.advancedResults');
+  // console.log(res.advancedResults, 'res.advancedResults');
 
   next();
 };
