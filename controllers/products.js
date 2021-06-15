@@ -50,7 +50,7 @@ const getProductById = asyncHandler(async (req, res) => {
     'category'
   );
 
-  if (product) {
+  if (product && product.length) {
     res.json({ data: product, success: true });
   } else {
     res.status(200).json({
