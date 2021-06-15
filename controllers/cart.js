@@ -30,7 +30,7 @@ const getSingleCart = asyncHandler(async (req, res, next) => {
   console.log(cart, 'cart');
 
   if (cart) {
-    res.status(200).json({ success: true, cart });
+    res.status(200).json({ data: cart.items, success: true });
   } else {
     res.status(200).json({
       success: false,
