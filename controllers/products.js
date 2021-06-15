@@ -46,13 +46,18 @@ const getProducts = asyncHandler(async (req, res) => {
  */
 const getProductById = asyncHandler(async (req, res) => {
   console.log(req.params.id, 'req.params.id');
-  const product = await Product.findById(req.params.id).populate('category');
+  const product = await Product.find({ _id: req.params.id }).populate(
+    'category'
+  );
 
   if (product) {
-    res.json(product);
+    res.json({ data: product, success: true });
   } else {
-    res.status(404);
-    throw new Error('Product not found');
+    res.status(200).json({
+      success: false,
+      message: 'Product not found',
+      data: null,
+    });
   }
 });
 
@@ -67,10 +72,13 @@ const deleteProduct = asyncHandler(async (req, res) => {
 
   if (product) {
     await product.remove();
-    res.json({ message: 'Product removed' });
+    res.json({ success: true, message: 'Product removed' });
   } else {
-    res.status(404);
-    throw new Error('Product not found');
+    res.status(200).json({
+      success: false,
+      message: 'Product not found',
+      data: null,
+    });
   }
 });
 
@@ -159,10 +167,16 @@ const createProduct = asyncHandler(async (req, res) => {
     ],
     (err) => {
       if (err) {
-        res.json({ success: false, err });
+        res.json({ success: false, err, data: null });
         return;
       }
       res.status(201).json({ product: req.product });
+
+      res.status(201).json({
+        success: false,
+        product: req.product,
+        data: null,
+      });
     }
   );
 });
@@ -267,10 +281,10 @@ const updateProduct = asyncHandler(async (req, res) => {
     ],
     (err) => {
       if (err) {
-        res.json({ success: false, err });
+        res.json({ success: false, err, data: null });
         return;
       }
-      res.status(201).json({ product: req.product });
+      res.status(201).json({ success: true, data: req.product });
     }
   );
 });
@@ -351,7 +365,11 @@ const createProductReview = asyncHandler(async (req, res) => {
 const getTopProducts = asyncHandler(async (req, res) => {
   const products = await Product.find({}).sort({ rating: -1 }).limit(3);
 
-  res.json(products);
+  if (products) {
+    res.json({ data: products, success: true });
+  } else {
+    res.json({ data: null, success: false });
+  }
 });
 
 export {

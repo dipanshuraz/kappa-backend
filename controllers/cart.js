@@ -35,6 +35,7 @@ const getSingleCart = asyncHandler(async (req, res, next) => {
     res.status(200).json({
       success: false,
       message: 'Cart is empty',
+      data: null,
     });
   }
 });
