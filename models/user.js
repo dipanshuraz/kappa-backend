@@ -10,7 +10,7 @@ const UserSchema = new Schema(
     name: { type: String, required: true },
     email: { type: String, required: true },
     password: { type: String, required: true },
-    country: { type: String, required: true },
+    country: { type: String, required: false, default: '' },
     verified: { type: Boolean, default: false },
     verificationCode: { type: String, required: false },
     resetPasswordToken: { type: String, required: false },
@@ -61,7 +61,7 @@ UserSchema.methods.generatePasswordReset = function () {
 };
 
 UserSchema.methods.getUserInfo = function () {
-  return pick(this, ['_id', 'email', 'name', 'verified', 'role']);
+  return pick(this, ['_id', 'email', 'name', 'verified', 'role', 'country']);
 };
 
 const User = model('users', UserSchema);

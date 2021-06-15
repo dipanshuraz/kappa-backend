@@ -178,9 +178,13 @@ const authenticate = asyncHandler(async (req, res) => {
  */
 
 const resetPassword = asyncHandler(async (req, res) => {
+  console.log(req.body, 'req.body resetPassword');
+
   let { email } = req.body;
 
   let user = await User.findOne({ email });
+
+  console.log(user, 'user');
 
   if (!user) {
     return res.status(200).json({
@@ -188,13 +192,17 @@ const resetPassword = asyncHandler(async (req, res) => {
       message: 'User with the email is not found.',
     });
   }
-  let a = user.generatePasswordReset();
+  let resetPassword = user.generatePasswordReset();
 
-  await user.save();
+  console.log(resetPassword, 'resetPassword');
+
+  let result = await user.save();
+  console.log(result, 'resilt');
+
   // Sent the password reset Link in the email.
   let html = `
         <div>
-            <h1>Hello, ${user.username}</h1>
+            <h1>Hello, ${user.name}</h1>
             <p>Please click the following link to reset your password.</p>
             <p>If this password reset request is not created by your then you can inore this email.</p>
             <a href="${DOMAIN}api/v1/auth/reset-password-now/${user.resetPasswordToken}">Reset Now</a>
@@ -206,7 +214,10 @@ const resetPassword = asyncHandler(async (req, res) => {
     'Please reset your password.',
     html
   );
-  return res.status(404).json({
+
+  console.log('mail sent');
+
+  return res.status(200).json({
     success: true,
     message: 'Password reset link is sent your email.',
   });
