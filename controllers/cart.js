@@ -32,7 +32,7 @@ const getSingleCart = asyncHandler(async (req, res, next) => {
   if (cart) {
     res.status(200).json(cart);
   } else {
-    res.status(404).json({
+    res.status(200).json({
       success: false,
       message: 'Cart is empty',
     });
