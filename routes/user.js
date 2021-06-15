@@ -3,7 +3,7 @@ const router = express.Router();
 
 import { userAuth, authorize } from '../middlewares/auth-guard';
 import { advancedResults } from '../middlewares/advancedResults';
-import { Product } from '../models';
+import { User } from '../models';
 
 import {
   updateUserProfile,
@@ -13,7 +13,7 @@ import {
   updateUser,
 } from '../controllers/user';
 
-router.route('/').get(advancedResults(Product), getUsers);
+router.route('/').get(advancedResults(User), getUsers);
 
 router.route('/profile').put(userAuth, authorize('user'), updateUserProfile);
 router.route('/:id').delete(deleteUser).get(getUserById).put(updateUser);

@@ -12,20 +12,26 @@ import { DOMAIN, JWT_COOKIE_EXPIRE, NODE_ENV } from '../constants';
  */
 
 const registerUser = asyncHandler(async (req, res) => {
-  let { username, email } = req.body;
+  console.log(req.body, 'req.body');
+  let { email, password, name, country } = req.body;
   // Check if the username is taken or not
-  let user = await User.findOne({ username });
-  if (user) {
-    return res.status(400).json({
-      success: false,
-      message: 'Username is already taken.',
-    });
-  }
+  // let user = await User.findOne({ username });
+  // if (user) {
+  //   return res.status(400).json({
+  //     success: false,
+  //     message: 'Username is already taken.',
+  //   });
+  // }
 
   // Check if the user exists with that email
-  user = await User.findOne({ email });
+  console.log(email, 'entry');
+
+  let user = await User.findOne({ email });
+
+  console.log(user, 'user');
+
   if (user) {
-    return res.status(400).json({
+    return res.status(200).json({
       success: false,
       message:
         'Email is already registered. Did you forget the password. Try resetting it.',
@@ -33,7 +39,10 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   user = new User({
-    ...req.body,
+    email,
+    password,
+    name,
+    country,
     verificationCode: randomBytes(20).toString('hex'),
   });
 
@@ -43,7 +52,7 @@ const registerUser = asyncHandler(async (req, res) => {
         <div>
             <h1>Hello, ${user.username}</h1>
             <p>Please click the following link to verify your account</p>
-            <a href="${DOMAIN}users/verify-now/${user.verificationCode}">Verify Now</a>
+            <a href="${DOMAIN}api/v1/auth/verify-now/${user.verificationCode}">Verify Now</a>
         </div>
     `;
 
@@ -100,21 +109,32 @@ const verifyUser = asyncHandler(async (req, res) => {
  */
 
 const authenticateUser = asyncHandler(async (req, res) => {
-  console.log(req.body, 'req.body');
-  let { username, password } = req.body;
-  let user = await User.findOne({ username });
+  let { email, password, role } = req.body;
+  console.log(email, password, role, 'email, password, role ');
+
+  let user = await User.findOne({ email: email });
+
   if (!user) {
     return res.status(404).json({
       success: false,
-      message: 'Username not found.',
+      message: 'User not found.',
     });
   }
+
+  if (user.role !== role) {
+    return res.status(401).json({
+      success: false,
+      message: 'Incorrect Details.',
+    });
+  }
+
   if (!(await user.comparePassword(password))) {
     return res.status(401).json({
       success: false,
       message: 'Incorrect password.',
     });
   }
+
   let token = await user.generateJWT();
 
   const options = {
@@ -163,14 +183,12 @@ const resetPassword = asyncHandler(async (req, res) => {
   let user = await User.findOne({ email });
 
   if (!user) {
-    return res.status(404).json({
+    return res.status(200).json({
       success: false,
       message: 'User with the email is not found.',
     });
   }
   let a = user.generatePasswordReset();
-
-  console.log(a, 'a');
 
   await user.save();
   // Sent the password reset Link in the email.
@@ -179,7 +197,7 @@ const resetPassword = asyncHandler(async (req, res) => {
             <h1>Hello, ${user.username}</h1>
             <p>Please click the following link to reset your password.</p>
             <p>If this password reset request is not created by your then you can inore this email.</p>
-            <a href="${DOMAIN}users/reset-password-now/${user.resetPasswordToken}">Verify Now</a>
+            <a href="${DOMAIN}api/v1/auth/reset-password-now/${user.resetPasswordToken}">Reset Now</a>
         </div>
       `;
   await sendMail(
