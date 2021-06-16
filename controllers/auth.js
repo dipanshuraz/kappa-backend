@@ -167,6 +167,7 @@ const authenticateUser = asyncHandler(async (req, res) => {
 const authenticate = asyncHandler(async (req, res) => {
   return res.status(200).json({
     user: req.user,
+    success: true,
   });
 });
 
