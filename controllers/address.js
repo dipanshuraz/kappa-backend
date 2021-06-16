@@ -16,21 +16,7 @@ const getAddresses = asyncHandler(async (req, res) => {
 });
 
 const addAddress = asyncHandler(async (req, res) => {
-  console.log('enter in address');
-
-  let id;
-  if (req.user) {
-    id = req.user._id;
-  } else {
-    id = '60b91c696807c4197c691214';
-  }
-
-  console.log(id, 'id');
-
-  // mongoose.Types.ObjectId()
-  const user = await User.findById(id);
-
-  console.log(user, 'user');
+  const user = await User.findById(req.user._id);
 
   if (req.body.default) {
     user.shippingAddress.forEach((elem) => {
@@ -47,7 +33,9 @@ const addAddress = asyncHandler(async (req, res) => {
   }
 
   await user.save();
-  res.status(200).json({ shippingAddress: user.shippingAddress });
+  res
+    .status(200)
+    .json({ success: true, shippingAddress: user.shippingAddress });
 });
 
 const updateAddress = asyncHandler(async (req, res) => {
@@ -105,16 +93,7 @@ const updateAddress = asyncHandler(async (req, res) => {
 });
 
 const deleteAddress = asyncHandler(async (req, res) => {
-  console.log('enter in delete address');
-
-  let userId;
-  if (req.user) {
-    userId = req.user._id;
-  } else {
-    userId = '60b91c696807c4197c691214';
-  }
-
-  const user = await User.findById(userId);
+  const user = await User.findById(req.user._id);
   const { id } = req.params;
 
   let addresses = user.shippingAddress.filter((elem) => {
@@ -132,7 +111,9 @@ const deleteAddress = asyncHandler(async (req, res) => {
   }
 
   await user.save();
-  res.status(200).json({ shippingAddress: user.shippingAddress });
+  res
+    .status(200)
+    .json({ success: true, shippingAddress: user.shippingAddress });
 });
 
 export { getAddresses, addAddress, updateAddress, deleteAddress };

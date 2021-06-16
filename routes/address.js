@@ -14,6 +14,9 @@ import {
 
 router.route('/').get(userAuth, getAddresses).post(userAuth, addAddress);
 
-router.route('/:id').put(updateAddress).delete(deleteAddress);
+router
+  .route('/:id')
+  .put(userAuth, updateAddress)
+  .delete(userAuth, deleteAddress);
 
 export default router;
