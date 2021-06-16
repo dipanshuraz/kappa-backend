@@ -9,14 +9,10 @@ import asyncHandler from 'express-async-handler';
  */
 
 const getAddresses = asyncHandler(async (req, res) => {
-  let id;
-  if (req.user) {
-    id = req.user._id;
-  } else {
-    id = '60b91c696807c4197c691214';
-  }
-  const user = await User.findById(id);
-  res.status(200).json({ shippingAddress: user.shippingAddress });
+  const user = await User.findById(req.user._id);
+  res
+    .status(200)
+    .json({ success: true, shippingAddress: user.shippingAddress });
 });
 
 const addAddress = asyncHandler(async (req, res) => {
