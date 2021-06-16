@@ -101,7 +101,7 @@ const addToCart = asyncHandler(async (req, res, next) => {
 const removeFromCart = asyncHandler(async (req, res, next) => {
   req.body.user = '60b91c696807c4197c691214';
 
-  const cart = await Cart.findOne({
+  let cart = await Cart.findOne({
     user: mongoose.Types.ObjectId(req.body.user),
   });
 
