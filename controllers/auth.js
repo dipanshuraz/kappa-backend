@@ -122,14 +122,14 @@ const authenticateUser = asyncHandler(async (req, res) => {
   }
 
   if (user.role !== role) {
-    return res.status(401).json({
+    return res.status(200).json({
       success: false,
       message: 'Incorrect Details.',
     });
   }
 
   if (!(await user.comparePassword(password))) {
-    return res.status(401).json({
+    return res.status(200).json({
       success: false,
       message: 'Incorrect password.',
     });

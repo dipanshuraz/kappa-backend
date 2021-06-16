@@ -22,10 +22,11 @@ const getCategory = asyncHandler(async (req, res, next) => {
   const category = await Category.findById(req.params.categoryId);
 
   if (!category) {
-    res.status(404);
-    throw new Error(
-      `Category is not found with id of ${req.params.categoryId}`
-    );
+    res.status(200).send({
+      success: false,
+      data: [],
+      message: `Category is not found with id of ${req.params.categoryId}`,
+    });
   }
 
   res.status(200).send({ status: 'success', data: category });
@@ -49,11 +50,14 @@ const addCategory = asyncHandler(async (req, res, next) => {
   console.log(category, 'category');
 
   if (category) {
-    res.status(404);
-    throw new Error(`Category already exists ${categoryName}`);
+    res.status(200).send({
+      success: false,
+      data: [],
+      message: `Category already exists ${categoryName}`,
+    });
   } else {
     category = await Category.create({ categoryName });
-    res.status(201).send({ status: 'success', data: category });
+    res.status(201).send({ success: true, data: category });
   }
 });
 
@@ -78,15 +82,16 @@ const updateCategory = asyncHandler(async (req, res, next) => {
   );
 
   if (!editCategory) {
-    res.status(404);
-    throw new Error(
-      `Category is not found with id of ${req.params.categoryId}`
-    );
+    res.status(200).send({
+      success: false,
+      data: [],
+      message: `Category is not found with id of ${req.params.categoryId}`,
+    });
   }
 
   const updatedUser = await Category.findById(req.params.categoryId);
 
-  res.status(201).send({ status: 'success', data: updatedUser });
+  res.status(201).send({ success: true, data: updatedUser });
 });
 
 /**
@@ -100,15 +105,16 @@ const removeCategory = asyncHandler(async (req, res, next) => {
   const findCategory = await Category.findByIdAndDelete(req.params.categoryId);
 
   if (!findCategory) {
-    res.status(404);
-    throw new Error(
-      `Category is not found with id of ${req.params.categoryId}`
-    );
+    res.status(200).send({
+      success: false,
+      data: [],
+      message: `Category is not found with id of ${req.params.categoryId}`,
+    });
   }
 
   res
     .status(200)
-    .json({ status: 'success', message: 'Category Deleted Successfully' });
+    .json({ success: true, message: 'Category Deleted Successfully' });
 });
 
 module.exports = {

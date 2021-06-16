@@ -56,7 +56,7 @@ const getProductById = asyncHandler(async (req, res) => {
     res.status(200).json({
       success: false,
       message: 'Product not found',
-      data: null,
+      data: [],
     });
   }
 });
@@ -77,7 +77,7 @@ const deleteProduct = asyncHandler(async (req, res) => {
     res.status(200).json({
       success: false,
       message: 'Product not found',
-      data: null,
+      data: [],
     });
   }
 });
@@ -170,12 +170,12 @@ const createProduct = asyncHandler(async (req, res) => {
         res.json({ success: false, err, data: null });
         return;
       }
-      res.status(201).json({ product: req.product });
+      res.status(201).json({ success: true, product: req.product });
 
       res.status(201).json({
         success: false,
         product: req.product,
-        data: null,
+        data: [],
       });
     }
   );
@@ -281,7 +281,7 @@ const updateProduct = asyncHandler(async (req, res) => {
     ],
     (err) => {
       if (err) {
-        res.json({ success: false, err, data: null });
+        res.json({ success: false, err, data: [] });
         return;
       }
       res.status(201).json({ success: true, data: req.product });
@@ -349,10 +349,9 @@ const createProductReview = asyncHandler(async (req, res) => {
       product.reviews.length;
 
     await product.save();
-    res.status(201).json({ message: 'Review added' });
+    res.status(201).json({ success: true, message: 'Review added' });
   } else {
-    res.status(404);
-    throw new Error('Product not found');
+    res.status(201).json({ success: false, message: 'Product not found' });
   }
 });
 
@@ -365,10 +364,10 @@ const createProductReview = asyncHandler(async (req, res) => {
 const getTopProducts = asyncHandler(async (req, res) => {
   const products = await Product.find({}).sort({ rating: -1 }).limit(3);
 
-  if (products) {
+  if (products && products.length) {
     res.json({ data: products, success: true });
   } else {
-    res.json({ data: null, success: false });
+    res.json({ data: [], success: false });
   }
 });
 
