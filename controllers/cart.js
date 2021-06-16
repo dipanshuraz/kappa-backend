@@ -154,6 +154,16 @@ const updateItem = asyncHandler(async (req, res) => {
 
   await cart.save();
 
+  cart = await Cart.findOne({
+    user: mongoose.Types.ObjectId(req.body.user),
+  }).populate({
+    path: 'items.product',
+    populate: {
+      path: 'category',
+      model: 'Category',
+    },
+  });
+
   res.status(200).json({ success: false, data: cart });
 });
 
