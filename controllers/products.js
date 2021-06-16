@@ -46,17 +46,17 @@ const getProducts = asyncHandler(async (req, res) => {
  */
 const getProductById = asyncHandler(async (req, res) => {
   console.log(req.params.id, 'req.params.id');
-  const product = await Product.find({ _id: req.params.id }).populate(
+  const product = await Product.findOne({ _id: req.params.id }).populate(
     'category'
   );
 
-  if (product && product.length) {
+  if (product) {
     res.json({ data: product, success: true });
   } else {
     res.status(200).json({
       success: false,
       message: 'Product not found',
-      data: [],
+      data: {},
     });
   }
 });

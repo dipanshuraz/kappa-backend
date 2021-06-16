@@ -103,12 +103,6 @@ const removeFromCart = asyncHandler(async (req, res, next) => {
 
   const cart = await Cart.findOne({
     user: mongoose.Types.ObjectId(req.body.user),
-  }).populate({
-    path: 'items.product',
-    populate: {
-      path: 'category',
-      model: 'Category',
-    },
   });
 
   console.log(cart, 'cart in backnd');
@@ -124,6 +118,16 @@ const removeFromCart = asyncHandler(async (req, res, next) => {
 
   cart.items = result;
   await cart.save();
+
+  cart = await Cart.findOne({
+    user: mongoose.Types.ObjectId(req.body.user),
+  }).populate({
+    path: 'items.product',
+    populate: {
+      path: 'category',
+      model: 'Category',
+    },
+  });
 
   res.status(200).json({ status: 'success', data: cart });
 });
