@@ -24,10 +24,20 @@ const advancedResults = (model, populate) => async (req, res, next) => {
   if (req.query.search) {
     const search = req.query.search
       ? {
-          title: {
-            $regex: req.query.search,
-            $options: 'i',
-          },
+          $or: [
+            {
+              title: {
+                $regex: req.query.search,
+                $options: 'i',
+              },
+            },
+            {
+              description: {
+                $regex: req.query.search,
+                $options: 'i',
+              },
+            },
+          ],
         }
       : {};
     queryStr = JSON.parse(queryStr);
