@@ -4,8 +4,10 @@ const advancedResults = (model, populate) => async (req, res, next) => {
   // Copy req.query
   const reqQuery = { ...req.query };
 
+  console.log(req.query, 'req.query start');
+
   // Fields to exclude
-  const removeFields = ['select', 'sort', 'page', 'limit'];
+  const removeFields = ['select', 'sort', 'page', 'limit', 'search'];
 
   // Loop over removeFields and delete them from reqQuery
   removeFields.forEach((param) => delete reqQuery[param]);
@@ -19,8 +21,23 @@ const advancedResults = (model, populate) => async (req, res, next) => {
     (match) => `$${match}`
   );
 
+  if (req.query.search) {
+    const search = req.query.search
+      ? {
+          title: {
+            $regex: req.query.search,
+            $options: 'i',
+          },
+        }
+      : {};
+    queryStr = JSON.parse(queryStr);
+    queryStr = { ...queryStr, ...search };
+  } else {
+    queryStr = JSON.parse(queryStr);
+  }
+
   // Finding resource
-  query = model.find(JSON.parse(queryStr));
+  query = model.find(queryStr);
 
   // Select Fields
   if (req.query.select) {
@@ -41,7 +58,7 @@ const advancedResults = (model, populate) => async (req, res, next) => {
   const limit = parseInt(req.query.limit, 10) || 5;
   const startIndex = (page - 1) * limit;
   const endIndex = page * limit;
-  const total = await model.countDocuments(JSON.parse(queryStr));
+  const total = await model.countDocuments(queryStr);
 
   query = query.skip(startIndex).limit(limit);
 

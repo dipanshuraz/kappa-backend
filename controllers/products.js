@@ -18,6 +18,7 @@ const getProducts = asyncHandler(async (req, res) => {
   // console.log(req.query, 'query');
   // const pageSize = 10;
   // const page = Number(req.query.pageNumber) || 1;
+
   // const keyword = req.query.keyword
   //   ? {
   //       title: {
@@ -26,6 +27,7 @@ const getProducts = asyncHandler(async (req, res) => {
   //       },
   //     }
   //   : {};
+
   // const count = await Product.countDocuments({ ...keyword });
   // const products = await Product.find({ ...keyword })
   //   .sort([
