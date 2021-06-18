@@ -18,6 +18,8 @@ const createOrder = asyncHandler(async (req, res) => {
     taxPrice,
     shippingPrice,
     totalPrice,
+    isPaid,
+    paidAt,
   } = req.body;
 
   if (orderItems && orderItems.length === 0) {
@@ -35,10 +37,19 @@ const createOrder = asyncHandler(async (req, res) => {
       taxPrice,
       shippingPrice,
       totalPrice,
+      isPaid,
+      paidAt,
     });
 
-    const createdOrder = await order.save();
-    console.log('1');
+    await order.save();
+    let orders = await Order.find({}).populate({
+      path: 'orderItems.product',
+      populate: {
+        path: 'category',
+        model: 'Category',
+      },
+    });
+
     let cart = await Cart.findOneAndDelete({
       user: req.user._id,
     });
@@ -46,7 +57,7 @@ const createOrder = asyncHandler(async (req, res) => {
 
     console.log(cart, 'cart is deleted');
 
-    res.status(201).json({ success: true, data: createdOrder });
+    res.status(201).json({ success: true, data: orders });
   }
 });
 
@@ -94,9 +105,16 @@ const updateOrderToPaid = asyncHandler(async (req, res) => {
       email_address: req.body.payer.email_address,
     };
 
-    const updatedOrder = await order.save();
+    await order.save();
+    let orders = await Order.find({}).populate({
+      path: 'orderItems.product',
+      populate: {
+        path: 'category',
+        model: 'Category',
+      },
+    });
 
-    res.status(200).json({ success: true, data: updatedOrder });
+    res.status(200).json({ success: true, data: orders });
   } else {
     res
       .status(404)
@@ -118,9 +136,16 @@ const updateOrderToDelivered = asyncHandler(async (req, res) => {
     order.isDelivered = true;
     order.deliveredAt = Date.now();
 
-    const updatedOrder = await order.save();
+    await order.save();
+    let orders = await Order.find({}).populate({
+      path: 'orderItems.product',
+      populate: {
+        path: 'category',
+        model: 'Category',
+      },
+    });
 
-    res.status(200).json({ success: true, data: updatedOrder });
+    res.status(200).json({ success: true, data: orders });
   } else {
     res
       .status(404)
