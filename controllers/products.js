@@ -104,6 +104,7 @@ const createProduct = asyncHandler(async (req, res) => {
     discount,
     category,
     countInStock,
+    priority,
   } = formData;
 
   let array = [];
@@ -119,6 +120,8 @@ const createProduct = asyncHandler(async (req, res) => {
         product.category = mongoose.Types.ObjectId(category);
         product.countInStock = countInStock;
         product.description = description;
+        product.priority = priority;
+        priority;
 
         product.save((err, product) => {
           if (err) {
@@ -202,6 +205,7 @@ const updateProduct = asyncHandler(async (req, res) => {
     discount,
     category,
     countInStock,
+    priority,
   } = formData;
 
   let array = [];
@@ -222,6 +226,7 @@ const updateProduct = asyncHandler(async (req, res) => {
               product.discount = discount;
               product.category = category;
               product.countInStock = countInStock;
+              product.priority = priority;
               product.save((err, doc) => {
                 if (err) {
                   cb(err);
