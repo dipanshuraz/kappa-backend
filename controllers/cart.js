@@ -2,6 +2,17 @@ import asyncHandler from 'express-async-handler';
 import mongoose from 'mongoose';
 import { Cart } from '../models';
 
+const upsert = (array, item) => {
+  const i = array.findIndex(
+    (_item) => _item.product.toString() === item.product
+  );
+  if (i > -1) {
+    let _item = array[i];
+    item.quantity += _item.quantity;
+    array[i] = item;
+  } else array.push(item);
+};
+
 /**
  * @description get all categories
  * @api /api/v1/category
@@ -15,7 +26,6 @@ const getCart = asyncHandler(async (req, res, next) => {
 
 const getSingleCart = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
-  console.log(id, 'req.params.id');
 
   const cart = await Cart.findOne({
     user: mongoose.Types.ObjectId(id),
@@ -26,8 +36,6 @@ const getSingleCart = asyncHandler(async (req, res, next) => {
       model: 'Category',
     },
   });
-
-  console.log(cart, 'cart');
 
   if (cart) {
     res.status(200).json({ data: cart.items, success: true });
@@ -51,44 +59,36 @@ const addToCart = asyncHandler(async (req, res, next) => {
   console.log(req.body, 'req.body');
   const { item } = req.body;
 
-  if (req.body.user) {
-    let cart = await Cart.findOne({ user: req.body.user });
-
-    if (cart) {
-      if (cart.items && cart.items.length) {
-        cart.items.forEach((cartItem) => {
-          if (cartItem.product.toString() === item.product.toString()) {
-            cartItem.quantity += item.quantity;
-          } else {
-            cart.items.push(item);
-          }
-        });
-      } else {
-        cart.items.push(item);
-      }
-    } else {
-      cart = await Cart.create({ user: req.body.user });
-      cart.items.push(item);
-    }
-
-    await cart.save();
-
-    cart = await Cart.findOne({
-      user: mongoose.Types.ObjectId(req.body.user),
-    }).populate({
-      path: 'items.product',
-      populate: {
-        path: 'category',
-        model: 'Category',
-      },
-    });
-
-    res.status(200).json({ success: true, data: cart });
-  } else {
+  if (!req.body.user) {
     res
       .status(200)
       .json({ success: false, data: [], message: 'No user found' });
   }
+
+  let cart = await Cart.findOne({ user: req.body.user });
+
+  if (cart) {
+    upsert(cart.items, item);
+    console.log('cart 1');
+  } else {
+    cart = await Cart.create({ user: req.body.user });
+    cart.items.push(item);
+    console.log('cart 2');
+  }
+
+  await cart.save();
+
+  cart = await Cart.findOne({
+    user: mongoose.Types.ObjectId(req.body.user),
+  }).populate({
+    path: 'items.product',
+    populate: {
+      path: 'category',
+      model: 'Category',
+    },
+  });
+
+  res.status(200).json({ success: true, data: cart });
 });
 
 /**

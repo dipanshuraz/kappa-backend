@@ -172,7 +172,6 @@ const createProduct = asyncHandler(async (req, res) => {
         res.json({ success: false, err, data: null });
         return;
       }
-      res.status(201).json({ success: true, product: req.product });
 
       res.status(201).json({
         success: false,
