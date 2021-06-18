@@ -261,16 +261,16 @@ const updateProduct = asyncHandler(async (req, res) => {
               }
 
               if (array && array.length) {
-                array.forEach((img) => {
-                  req.product.images.push(img);
-                });
+                req.product.images = array;
+                // array.forEach((img) => {
+                // req.product.images.push(img);
+                // });
               }
 
               req.product.save((err, product) => {
                 if (err) {
                   cb(err);
                 }
-                console.log('qwertyui');
                 cb();
               });
             }

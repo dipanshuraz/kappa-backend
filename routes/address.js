@@ -3,6 +3,7 @@ const router = express.Router();
 
 import { userAuth, authorize } from '../middlewares/auth-guard';
 import { advancedResults } from '../middlewares/advancedResults';
+import validatorMiddleware from '../middlewares/validator-middleware';
 import { user } from '../models';
 
 import {
@@ -12,7 +13,10 @@ import {
   deleteAddress,
 } from '../controllers/address';
 
-router.route('/').get(userAuth, getAddresses).post(userAuth, addAddress);
+router
+  .route('/')
+  .get(userAuth, getAddresses)
+  .post(userAuth, validatorMiddleware, addAddress);
 
 router
   .route('/:id')

@@ -1,5 +1,5 @@
 import asyncHandler from 'express-async-handler';
-import { Order } from '../models';
+import { Order, Cart } from '../models';
 import mongoose from 'mongoose';
 
 /**
@@ -18,16 +18,17 @@ const createOrder = asyncHandler(async (req, res) => {
     taxPrice,
     shippingPrice,
     totalPrice,
-    user,
   } = req.body;
 
   if (orderItems && orderItems.length === 0) {
-    res.status(400);
-    throw new Error('No order items');
+    res
+      .status(400)
+      .json({ message: 'No order items', success: false, data: [] });
   } else {
+    console.log('0');
     const order = new Order({
       orderItems,
-      user: mongoose.Types.ObjectId(user),
+      user: req.user._id,
       shippingAddress,
       paymentMethod,
       itemsPrice,
@@ -37,8 +38,15 @@ const createOrder = asyncHandler(async (req, res) => {
     });
 
     const createdOrder = await order.save();
+    console.log('1');
+    let cart = await Cart.findOneAndDelete({
+      user: req.user._id,
+    });
+    console.log('2');
 
-    res.status(201).json(createdOrder);
+    console.log(cart, 'cart is deleted');
+
+    res.status(201).json({ success: true, data: createdOrder });
   }
 });
 
@@ -59,10 +67,11 @@ const getOrderById = asyncHandler(async (req, res) => {
   });
 
   if (order) {
-    res.json(order);
+    res.status(200).json({ success: true, data: order });
   } else {
-    res.status(404);
-    throw new Error('Order not found');
+    res
+      .status(404)
+      .json({ success: true, data: [], message: 'Order not found' });
   }
 });
 
@@ -87,10 +96,11 @@ const updateOrderToPaid = asyncHandler(async (req, res) => {
 
     const updatedOrder = await order.save();
 
-    res.status(200).json(updatedOrder);
+    res.status(200).json({ success: true, data: updatedOrder });
   } else {
-    res.status(404);
-    throw new Error('Order not found');
+    res
+      .status(404)
+      .json({ success: false, data: [], message: 'Order Not Found' });
   }
 });
 
@@ -110,10 +120,11 @@ const updateOrderToDelivered = asyncHandler(async (req, res) => {
 
     const updatedOrder = await order.save();
 
-    res.status(200).json(updatedOrder);
+    res.status(200).json({ success: true, data: updatedOrder });
   } else {
-    res.status(404);
-    throw new Error('Order not found');
+    res
+      .status(404)
+      .json({ success: false, data: [], message: 'Order Not Found' });
   }
 });
 
