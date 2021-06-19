@@ -24,7 +24,7 @@ router
     }),
     getOrders
   )
-  .post( createOrder);
+  .post(userAuth, createOrder);
 
 router.route('/:id').get(userAuth, getOrderById);
 router.route('/:id/pay').put(userAuth, updateOrderToPaid);
