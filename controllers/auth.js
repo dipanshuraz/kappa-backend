@@ -42,7 +42,7 @@ const registerUser = asyncHandler(async (req, res) => {
         <div>
             <h1>Hello, ${user.name}</h1>
             <p>Please click the following link to verify your account</p>
-            <a href="${DOMAIN}api/v1/auth/verify-now/${user.verificationCode}">Verify Now</a>
+            <a href="${DOMAIN}verify/${user.verificationCode}">Verify Now</a>
         </div>
     `;
 
@@ -196,9 +196,9 @@ const resetPassword = asyncHandler(async (req, res) => {
             <h1>Hello, ${user.name}</h1>
             <p>Please click the following link to reset your password.</p>
             <p>If this password reset request is not created by your then you can inore this email.</p>
-            <a href="${DOMAIN}api/v1/auth/reset-password-now/${user.resetPasswordToken}">Reset Now</a>
-        </div>
-      `;
+            <a href="${DOMAIN}?resetToken=${user.resetPasswordToken}">Reset Now</a>
+        </div>`;
+
   await sendMail(
     user.email,
     'Reset Password',
@@ -206,7 +206,7 @@ const resetPassword = asyncHandler(async (req, res) => {
     html
   );
 
-  console.log('mail sent');
+  console.log(`${DOMAIN}resetPasswordNow/${user.resetPasswordToken}`,'mail sent');
 
   return res.status(200).json({
     success: true,
@@ -249,6 +249,9 @@ const resetPassword = asyncHandler(async (req, res) => {
  */
 
 const resetPasswordNow = asyncHandler(async (req, res) => {
+  console.log(req.body,'req.body');
+  
+
   let { resetPasswordToken, password } = req.body;
   let user = await User.findOne({
     resetPasswordToken,

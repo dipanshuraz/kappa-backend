@@ -29,6 +29,6 @@ router
 
 router.route('/reset-password').put(ResetPassword, Validator, resetPassword);
 // router.route('/reset-password-now/:resetPasswordToken').get(resetPasswordToken);
-router.route('/reset-password-now').post(resetPasswordNow);
+router.route('/resetPasswordNow').post(resetPasswordNow);
 
 export default router;
