@@ -15,7 +15,6 @@ import { Order } from '../models';
 router
   .route('/')
   .get(
-    userAuth,
     advancedResults(Order, {
       path: 'orderItems.product',
       populate: {
@@ -25,10 +24,10 @@ router
     }),
     getOrders
   )
-  .post(userAuth, createOrder);
+  .post( createOrder);
 
 router.route('/:id').get(userAuth, getOrderById);
 router.route('/:id/pay').put(userAuth, updateOrderToPaid);
-router.route('/:id/deliver').put(userAuth, updateOrderToDelivered);
+router.route('/:id/deliver').put( updateOrderToDelivered);
 
 export default router;
