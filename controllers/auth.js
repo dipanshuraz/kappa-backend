@@ -14,21 +14,11 @@ import { DOMAIN, JWT_COOKIE_EXPIRE, NODE_ENV } from '../constants';
 const registerUser = asyncHandler(async (req, res) => {
   console.log(req.body, 'req.body');
   let { email, password, name, country } = req.body;
-  // Check if the username is taken or not
-  // let user = await User.findOne({ username });
-  // if (user) {
-  //   return res.status(400).json({
-  //     success: false,
-  //     message: 'Username is already taken.',
-  //   });
-  // }
 
   // Check if the user exists with that email
   console.log(email, 'entry');
 
   let user = await User.findOne({ email });
-
-  console.log(user, 'user');
 
   if (user) {
     return res.status(200).json({
@@ -50,7 +40,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
   let html = `
         <div>
-            <h1>Hello, ${user.username}</h1>
+            <h1>Hello, ${user.name}</h1>
             <p>Please click the following link to verify your account</p>
             <a href="${DOMAIN}api/v1/auth/verify-now/${user.verificationCode}">Verify Now</a>
         </div>
@@ -291,7 +281,7 @@ const resetPasswordNow = asyncHandler(async (req, res) => {
   return res.status(200).json({
     success: true,
     message:
-      'Your password reset request is complete and your password is resetted successfully. Login into your account with your new password.',
+      'Your password reset request is complete and your password is reset successfully. Login into your account with your new password.',
   });
 });
 
