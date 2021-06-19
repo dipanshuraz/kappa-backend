@@ -106,7 +106,7 @@ const advancedResults = (model, populate) => async (req, res, next) => {
     pagination,
     data: results,
     total,
-    category: results && results[0].category,
+    category: results && results.length && results[0].category,
   };
 
   next();
