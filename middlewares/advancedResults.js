@@ -47,6 +47,7 @@ const advancedResults = (model, populate) => async (req, res, next) => {
   }
 
   // Finding resource
+  console.log(queryStr, 'queryStr in start');
   query = model.find(queryStr);
 
   // Select Fields
@@ -68,17 +69,19 @@ const advancedResults = (model, populate) => async (req, res, next) => {
   const limit = parseInt(req.query.limit, 10) || 5;
   const startIndex = (page - 1) * limit;
   const endIndex = page * limit;
+
   const total = await model.countDocuments(queryStr);
 
   query = query.skip(startIndex).limit(limit);
 
   if (populate) {
-    console.log(populate, 'populate');
     query = query.populate(populate);
   }
 
   // Executing query
   const results = await query;
+
+  console.log(results, 'query in advanceres');
 
   // Pagination result
   const pagination = {};
@@ -103,9 +106,8 @@ const advancedResults = (model, populate) => async (req, res, next) => {
     pagination,
     data: results,
     total,
+    category: results && results[0].category,
   };
-
-  // console.log(res.advancedResults, 'res.advancedResults');
 
   next();
 };
