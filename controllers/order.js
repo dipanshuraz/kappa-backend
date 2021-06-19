@@ -10,6 +10,7 @@ import mongoose from 'mongoose';
  */
 
 const createOrder = asyncHandler(async (req, res) => {
+  console.log(req.body,'create order 1 ')
   const {
     orderItems,
     shippingAddress,

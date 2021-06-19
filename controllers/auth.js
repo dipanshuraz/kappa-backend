@@ -188,7 +188,7 @@ const resetPassword = asyncHandler(async (req, res) => {
   console.log(resetPassword, 'resetPassword');
 
   let result = await user.save();
-  console.log(result, 'resilt');
+
 
   // Sent the password reset Link in the email.
   let html = `
@@ -270,7 +270,7 @@ const resetPasswordNow = asyncHandler(async (req, res) => {
   // Send notification email about the password reset successfull process
   let html = `
         <div>
-            <h1>Hello, ${user.username}</h1>
+            <h1>Hello, ${user.name}</h1>
             <p>Your password is resetted successfully.</p>
             <p>If this rest is not done by you then you can contact our team.</p>
         </div>
