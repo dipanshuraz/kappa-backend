@@ -1,10 +1,10 @@
+import { Category } from '../models';
+
 const advancedResults = (model, populate) => async (req, res, next) => {
   let query;
 
   // Copy req.query
   const reqQuery = { ...req.query };
-
-  console.log(req.query, 'req.query start');
 
   // Fields to exclude
   const removeFields = ['select', 'sort', 'page', 'limit', 'search'];
@@ -47,7 +47,6 @@ const advancedResults = (model, populate) => async (req, res, next) => {
   }
 
   // Finding resource
-  console.log(queryStr, 'queryStr in start');
   query = model.find(queryStr);
 
   // Select Fields
@@ -81,8 +80,6 @@ const advancedResults = (model, populate) => async (req, res, next) => {
   // Executing query
   const results = await query;
 
-  console.log(results, 'query in advanceres');
-
   // Pagination result
   const pagination = {};
 
@@ -100,13 +97,15 @@ const advancedResults = (model, populate) => async (req, res, next) => {
     };
   }
 
+  let categoryName = await Category.findById(queryStr.category);
+
   res.advancedResults = {
     success: true,
     count: results.length,
     pagination,
     data: results,
     total,
-    category: results && results.length && results[0].category,
+    category: categoryName,
   };
 
   next();
