@@ -10,14 +10,16 @@ const router = require('express').Router();
 import { advancedResults } from '../middlewares/advancedResults';
 
 const { Cart } = require('../models/');
-// import { userAuth } from '../middlewares/auth-guard';
+import { userAuth } from '../middlewares/auth-guard';
 
 router
   .route('/')
-  .get(advancedResults(Cart), getCart)
-  .post(addToCart)
-  .put(updateItem);
+  .get(advancedResults(Cart), userAuth, getCart)
+  .post(userAuth, addToCart)
+  .put(userAuth, updateItem);
 
-router.route('/:id').get(getSingleCart).put(removeFromCart);
+router.route('/user').get(userAuth, getSingleCart);
+
+router.route('/item/:id').put(userAuth, removeFromCart);
 
 export default router;

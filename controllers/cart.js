@@ -25,10 +25,9 @@ const getCart = asyncHandler(async (req, res, next) => {
 });
 
 const getSingleCart = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-
+  console.log(req.user._id, 'getSingleCart');
   const cart = await Cart.findOne({
-    user: mongoose.Types.ObjectId(id),
+    user: mongoose.Types.ObjectId(req.user._id),
   }).populate({
     path: 'items.product',
     populate: {
@@ -56,30 +55,27 @@ const getSingleCart = asyncHandler(async (req, res, next) => {
  */
 
 const addToCart = asyncHandler(async (req, res, next) => {
-  console.log(req.body, 'req.body');
   const { item } = req.body;
 
-  if (!req.body.user) {
+  if (!req.user._id) {
     res
       .status(200)
       .json({ success: false, data: [], message: 'No user found' });
   }
 
-  let cart = await Cart.findOne({ user: req.body.user });
+  let cart = await Cart.findOne({ user: req.user._id });
 
   if (cart) {
     upsert(cart.items, item);
-    console.log('cart 1');
   } else {
-    cart = await Cart.create({ user: req.body.user });
+    cart = await Cart.create({ user: req.user._id });
     cart.items.push(item);
-    console.log('cart 2');
   }
 
   await cart.save();
 
   cart = await Cart.findOne({
-    user: mongoose.Types.ObjectId(req.body.user),
+    user: mongoose.Types.ObjectId(req.user._id),
   }).populate({
     path: 'items.product',
     populate: {
@@ -99,13 +95,9 @@ const addToCart = asyncHandler(async (req, res, next) => {
  */
 
 const removeFromCart = asyncHandler(async (req, res, next) => {
-  req.body.user = '60b91c696807c4197c691214';
-
   let cart = await Cart.findOne({
-    user: mongoose.Types.ObjectId(req.body.user),
+    user: mongoose.Types.ObjectId(req.user._id),
   });
-
-  console.log(cart, 'cart in backnd');
 
   const { id } = req.params;
 
@@ -134,10 +126,12 @@ const removeFromCart = asyncHandler(async (req, res, next) => {
 
 const updateItem = asyncHandler(async (req, res) => {
   const { itemId, type } = req.body;
-  let cart = await Cart.findOne({ user: req.body.user });
+
+  let cart = await Cart.findOne({ user: req.user._id });
 
   if (!cart) {
-    res.status(200).json({ success: 'false', data: [] });
+    console.log('2');
+    res.status(200).json({ success: false, data: [] });
   }
 
   cart.items.forEach((elem) => {
@@ -159,7 +153,7 @@ const updateItem = asyncHandler(async (req, res) => {
   await cart.save();
 
   cart = await Cart.findOne({
-    user: mongoose.Types.ObjectId(req.body.user),
+    user: mongoose.Types.ObjectId(req.user._id),
   }).populate({
     path: 'items.product',
     populate: {
@@ -168,7 +162,7 @@ const updateItem = asyncHandler(async (req, res) => {
     },
   });
 
-  res.status(200).json({ success: false, data: cart });
+  res.status(200).json({ success: true, data: cart });
 });
 
 module.exports = {
