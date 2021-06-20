@@ -40,14 +40,11 @@ const getCategory = asyncHandler(async (req, res, next) => {
  */
 
 const addCategory = asyncHandler(async (req, res, next) => {
-  let categoryName = req.body;
-  console.log(req.body, 'req.body');
-  categoryName = categoryName.categoryName.toLowerCase();
-  console.log(categoryName, 'req.body');
+  let { categoryName, active } = req.body;
+
+  categoryName = categoryName.toLowerCase();
 
   let category = await Category.findOne({ categoryName });
-
-  console.log(category, 'category');
 
   if (category) {
     res.status(200).send({
@@ -56,7 +53,7 @@ const addCategory = asyncHandler(async (req, res, next) => {
       message: `Category already exists ${categoryName}`,
     });
   } else {
-    category = await Category.create({ categoryName });
+    category = await Category.create({ categoryName, active });
     res.status(201).send({ success: true, data: category });
   }
 });

@@ -6,6 +6,10 @@ const CategorySchema = new Schema({
     required: [true, 'Please add a category name'],
     trim: true,
   },
+  active: {
+    type: Boolean,
+    default: false,
+  },
   createdAt: {
     type: Date,
     default: Date.now,
