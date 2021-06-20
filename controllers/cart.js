@@ -112,7 +112,7 @@ const removeFromCart = asyncHandler(async (req, res, next) => {
   await cart.save();
 
   cart = await Cart.findOne({
-    user: mongoose.Types.ObjectId(req.body.user),
+    user: mongoose.Types.ObjectId(req.user._id),
   }).populate({
     path: 'items.product',
     populate: {
