@@ -77,14 +77,11 @@ app.use('/api/v1/address', addressApi);
 // app.use('/api/v1/wishlist', wishlistApi);
 
 app.get('/api/v1/config/paypal', (req, res) => {
-  console.log('enter in paypal');
   res.json({ data: process.env.PAYPAL_CLIENT_ID });
 });
 
 app.use(notFound);
 app.use(errorHandler);
-
-console.log(PORT, 'PORT');
 
 app.listen(PORT || 3000, () => {
   consola.success(`Server running on port ${PORT}`);

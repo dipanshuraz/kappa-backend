@@ -10,7 +10,7 @@ import mongoose from 'mongoose';
  */
 
 const createOrder = asyncHandler(async (req, res) => {
-  console.log(req.body,'create order 1 ')
+  console.log(req.body, 'create order 1 ');
   const {
     orderItems,
     shippingAddress,
@@ -165,10 +165,15 @@ const getOrders = asyncHandler(async (req, res) => {
   res.status(200).json({ data: res.advancedResults });
 });
 
+const getMyOrders = asyncHandler(async (req, res) => {
+  res.status(200).json({ data: res.advancedResults });
+});
+
 export {
   createOrder,
   getOrderById,
   updateOrderToPaid,
   updateOrderToDelivered,
   getOrders,
+  getMyOrders,
 };

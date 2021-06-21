@@ -4,6 +4,7 @@ import {
   updateOrderToPaid,
   updateOrderToDelivered,
   getOrders,
+  getMyOrders,
 } from '../controllers/order';
 
 import express from 'express';
@@ -26,8 +27,20 @@ router
   )
   .post(userAuth, createOrder);
 
+router.route('/myorders').get(
+  userAuth,
+  advancedResults(Order, {
+    path: 'orderItems.product',
+    populate: {
+      path: 'category',
+      model: 'Category',
+    },
+  }),
+  getMyOrders
+);
+
 router.route('/:id').get(userAuth, getOrderById);
 router.route('/:id/pay').put(userAuth, updateOrderToPaid);
-router.route('/:id/deliver').put( updateOrderToDelivered);
+router.route('/:id/deliver').put(updateOrderToDelivered);
 
 export default router;

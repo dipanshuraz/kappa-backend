@@ -49,8 +49,6 @@ const addAddress = asyncHandler(async (req, res) => {
 });
 
 const updateAddress = asyncHandler(async (req, res) => {
-  console.log(req.params, 'hello', req.body, 'req.user');
-
   const { id } = req.params;
 
   const {
@@ -69,9 +67,7 @@ const updateAddress = asyncHandler(async (req, res) => {
   }
 
   user.shippingAddress.forEach((item) => {
-    console.log(item._id, 'item', id, 'id');
     if (item._id.toString() === id.toString()) {
-      console.log(id, 'object');
       (item.address = address),
         (item.city = city),
         (item.state = state),

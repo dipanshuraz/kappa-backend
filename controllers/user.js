@@ -8,27 +8,56 @@ import asyncHandler from 'express-async-handler';
  * @type PUT
  */
 const updateUserProfile = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user._id);
+  console.log(req.user._id, 'req.user._id');
+
+  let user = await User.findById(req.user._id);
+
+  console.log(user, 'user');
 
   if (user) {
-    user.name = req.body.name || user.name;
-    user.email = req.body.email || user.email;
-    if (req.body.password) {
-      user.password = req.body.password;
+    if (user.email !== req.body.email) {
+      user = await User.findOne({ email: req.body.email });
+
+      if (user) {
+        res.status(404).json({
+          success: false,
+          user: {},
+          message: 'User already exists with this mail',
+        });
+      }
     }
 
+    user.name = req.body.name || user.name;
+    user.email = req.body.email || user.email;
+    user.country = req.body.country || user.country;
+
+    console.log('1');
+    if (req.body.password) {
+      console.log('2');
+      user.password = req.body.password;
+    }
+    console.log('3');
+
     const updatedUser = await user.save();
+    let token = await user.generateJWT();
+    console.log('4');
 
     res.json({
-      _id: updatedUser._id,
-      name: updatedUser.name,
-      email: updatedUser.email,
-      isAdmin: updatedUser.isAdmin,
-      token: generateToken(updatedUser._id),
+      success: true,
+      user: {
+        _id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        role: updatedUser.role,
+        country: updatedUser.country,
+      },
+      token: `Bearer ${token}`,
     });
+    console.log('5');
   } else {
-    res.status(404);
-    throw new Error('User not found');
+    res
+      .status(404)
+      .json({ success: false, user: {}, message: 'User not found' });
   }
 });
 
