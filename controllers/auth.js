@@ -102,6 +102,7 @@ const authenticateUser = asyncHandler(async (req, res) => {
   let { email, password, role } = req.body;
   console.log(email, password, role, 'email, password, role ');
 
+  email = email.toLowerCase();
   let user = await User.findOne({ email: email });
 
   if (!user) {
@@ -189,7 +190,6 @@ const resetPassword = asyncHandler(async (req, res) => {
 
   let result = await user.save();
 
-
   // Sent the password reset Link in the email.
   let html = `
         <div>
@@ -206,7 +206,10 @@ const resetPassword = asyncHandler(async (req, res) => {
     html
   );
 
-  console.log(`${DOMAIN}resetPasswordNow/${user.resetPasswordToken}`,'mail sent');
+  console.log(
+    `${DOMAIN}resetPasswordNow/${user.resetPasswordToken}`,
+    'mail sent'
+  );
 
   return res.status(200).json({
     success: true,
@@ -249,8 +252,7 @@ const resetPassword = asyncHandler(async (req, res) => {
  */
 
 const resetPasswordNow = asyncHandler(async (req, res) => {
-  console.log(req.body,'req.body');
-  
+  console.log(req.body, 'req.body');
 
   let { resetPasswordToken, password } = req.body;
   let user = await User.findOne({

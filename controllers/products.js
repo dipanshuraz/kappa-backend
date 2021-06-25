@@ -1,5 +1,5 @@
 import asyncHandler from 'express-async-handler';
-import { Product } from '../models';
+import { Product, Order, Cart } from '../models';
 import mongoose from 'mongoose';
 import async from 'async';
 import fs from 'fs';
@@ -15,28 +15,6 @@ const unlinkFile = util.promisify(fs.unlink);
  */
 
 const getProducts = asyncHandler(async (req, res) => {
-  // console.log(req.query, 'query');
-  // const pageSize = 10;
-  // const page = Number(req.query.pageNumber) || 1;
-
-  // const keyword = req.query.keyword
-  //   ? {
-  //       title: {
-  //         $regex: req.query.keyword,
-  //         $options: 'i',
-  //       },
-  //     }
-  //   : {};
-
-  // const count = await Product.countDocuments({ ...keyword });
-  // const products = await Product.find({ ...keyword })
-  //   .sort([
-  //     // ['price', req.query.sortBy],
-  //     ['title', req.query.sortBy],
-  //   ])
-  //   .limit(pageSize)
-  //   .skip(pageSize * (page - 1));
-  // res.json({ products, page, pages: Math.ceil(count / pageSize) });
   res.status(200).json(res.advancedResults);
 });
 
@@ -47,7 +25,6 @@ const getProducts = asyncHandler(async (req, res) => {
  * @type GET
  */
 const getProductById = asyncHandler(async (req, res) => {
-  console.log(req.params.id, 'req.params.id');
   const product = await Product.findOne({ _id: req.params.id }).populate(
     'category'
   );
@@ -69,19 +46,104 @@ const getProductById = asyncHandler(async (req, res) => {
  * @access Private/Admin
  * @type DELETE
  */
-const deleteProduct = asyncHandler(async (req, res) => {
-  const product = await Product.findById(req.params.id);
 
-  if (product) {
-    await product.remove();
-    res.json({ success: true, message: 'Product removed' });
-  } else {
-    res.status(200).json({
-      success: false,
-      message: 'Product not found',
-      data: [],
-    });
-  }
+const deleteProduct = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  async.series(
+    [
+      (cb) => {
+        Product.deleteOne({ _id: id }).exec((err, product) => {
+          if (err) {
+            return cb(err);
+          }
+          cb();
+        });
+      },
+      (cb) => {
+        Cart.find({}).exec((err, carts) => {
+          if (err) {
+            cb(err);
+            return;
+          }
+          async.eachSeries(
+            carts,
+            (cart, callback) => {
+              if (cart && cart.items && cart.items.length) {
+                let newItems = cart.items.filter((elem) => {
+                  return elem.product.toString() !== id.toString();
+                });
+                cart.items = newItems;
+                cart.save((err, data) => {
+                  if (err) {
+                    callback(err);
+                    return;
+                  }
+                  callback();
+                });
+              } else {
+                callback();
+              }
+            },
+            (err) => {
+              if (err) {
+                cb(err);
+                return;
+              }
+              cb();
+            }
+          );
+        });
+      },
+      (cb) => {
+        Order.find({}).exec((err, orders) => {
+          if (err) {
+            cb(err);
+            return;
+          }
+          async.eachSeries(
+            orders,
+            (order, callback) => {
+              if (order && order.orderItems && order.orderItems.length) {
+                let newOrderItems = order.orderItems.filter((elem) => {
+                  return elem.product.toString() !== id.toString();
+                });
+                order.orderItems = newOrderItems;
+                order.save((err, data) => {
+                  if (err) {
+                    callback(err);
+                    return;
+                  }
+                  callback();
+                });
+              } else {
+                callback();
+              }
+            },
+            (err) => {
+              if (err) {
+                cb(err);
+                return;
+              }
+              cb();
+            }
+          );
+        });
+      },
+    ],
+    (err) => {
+      if (err) {
+        res.json({ success: false, err, data: null, message: 'Error occured' });
+        return;
+      }
+
+      res.status(200).json({
+        success: true,
+        message: 'Product removed',
+        data: [],
+      });
+    }
+  );
 });
 
 /**
@@ -92,8 +154,6 @@ const deleteProduct = asyncHandler(async (req, res) => {
  */
 
 const createProduct = asyncHandler(async (req, res) => {
-  console.log(req.files, 'files');
-  console.log(JSON.parse(req.body.data), 'body');
   let formData = JSON.parse(req.body.data);
   const {
     user,
@@ -127,7 +187,7 @@ const createProduct = asyncHandler(async (req, res) => {
           if (err) {
             cb(err);
           }
-          // console.log(product, 'product');
+
           req.product = product;
           cb();
         });
@@ -145,13 +205,12 @@ const createProduct = asyncHandler(async (req, res) => {
                 })
                 .catch((err) => {
                   callback(err);
-                  console.log('in erro', err);
+
                   return;
                 });
             },
             (err) => {
               if (err) {
-                console.log('in erro2', err);
                 cb(err);
                 return;
               }
@@ -160,7 +219,7 @@ const createProduct = asyncHandler(async (req, res) => {
                 if (err) {
                   cb(err);
                 }
-                console.log('qwertyui');
+
                 cb();
               });
             }
@@ -193,8 +252,6 @@ const createProduct = asyncHandler(async (req, res) => {
  */
 
 const updateProduct = asyncHandler(async (req, res) => {
-  console.log(req.files, 'files');
-  console.log(JSON.parse(req.body.data), 'body');
   let formData = JSON.parse(req.body.data);
   const {
     user,
@@ -254,13 +311,11 @@ const updateProduct = asyncHandler(async (req, res) => {
                 })
                 .catch((err) => {
                   callback(err);
-                  console.log('in erro', err);
                   return;
                 });
             },
             (err) => {
               if (err) {
-                console.log('in erro2', err);
                 cb(err);
                 return;
               }

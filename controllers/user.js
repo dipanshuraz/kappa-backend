@@ -8,33 +8,32 @@ import asyncHandler from 'express-async-handler';
  * @type PUT
  */
 const updateUserProfile = asyncHandler(async (req, res) => {
-  console.log(req.user._id, 'req.user._id');
+  console.log(req.user, 'req.user._id');
 
   let user = await User.findById(req.user._id);
 
-  console.log(user, 'user');
-
   if (user) {
     if (user.email !== req.body.email) {
-      user = await User.findOne({ email: req.body.email });
+      user = await User.findOne({ email: req.user.email });
 
       if (user) {
         res.status(404).json({
           success: false,
-          user: {},
           message: 'User already exists with this mail',
         });
       }
     }
 
-    user.name = req.body.name || user.name;
-    user.email = req.body.email || user.email;
-    user.country = req.body.country || user.country;
+    console.log('0');
+
+    user.name = req.user.name || user.name;
+    user.email = req.user.email || user.email;
+    user.country = req.user.country || user.country;
 
     console.log('1');
-    if (req.body.password) {
+    if (req.user.password) {
       console.log('2');
-      user.password = req.body.password;
+      user.password = req.user.password;
     }
     console.log('3');
 
@@ -52,12 +51,14 @@ const updateUserProfile = asyncHandler(async (req, res) => {
         country: updatedUser.country,
       },
       token: `Bearer ${token}`,
+      message: 'Updated successfully.',
     });
     console.log('5');
   } else {
-    res
-      .status(404)
-      .json({ success: false, user: {}, message: 'User not found' });
+    res.status(404).json({
+      success: false,
+      message: 'User not found',
+    });
   }
 });
 
