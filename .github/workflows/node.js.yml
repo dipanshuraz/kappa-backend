@@ -46,6 +46,6 @@ jobs:
           cat .env
 
       - run: npm i
-      script: |
+      - script: |
           cd ~/kappa-backend/kappa-backend/kappa-backend
           pm2 restart BackendAPI
