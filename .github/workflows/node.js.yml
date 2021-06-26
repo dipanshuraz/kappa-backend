@@ -47,8 +47,3 @@ jobs:
 
       - run: npm i
       - run: pm2 start index.js --node-args="-r esm"
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-        run: pullreminders/slack-action@master
-        with:
-          args: '{\"channel\":\"C025V24TQK1\",\"text\":\"Hello world\"}'
