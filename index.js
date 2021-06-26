@@ -84,7 +84,7 @@ app.use(notFound);
 app.use(errorHandler);
 
 app.listen(PORT || 3000, () => {
-  consola.success(`Server running on port RAVI ${PORT}`);
+  consola.success(`Server running on port ${PORT}`);
 });
 
 // Handle unhandled promise rejections

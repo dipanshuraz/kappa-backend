@@ -12,7 +12,7 @@ const sendMail = async (email, subject, text, html) => {
       to: email,
       from: HOST_EMAIL,
     };
-    console.log(msg);
+
     await sgMail.send(msg);
     console.log('MAIL_SENT');
   } catch (err) {

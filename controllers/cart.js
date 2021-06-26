@@ -25,7 +25,6 @@ const getCart = asyncHandler(async (req, res, next) => {
 });
 
 const getSingleCart = asyncHandler(async (req, res, next) => {
-  console.log(req.user._id, 'getSingleCart');
   const cart = await Cart.findOne({
     user: mongoose.Types.ObjectId(req.user._id),
   }).populate({
@@ -130,7 +129,6 @@ const updateItem = asyncHandler(async (req, res) => {
   let cart = await Cart.findOne({ user: req.user._id });
 
   if (!cart) {
-    console.log('2');
     res.status(200).json({ success: false, data: [] });
   }
 

@@ -8,8 +8,6 @@ import asyncHandler from 'express-async-handler';
  * @type PUT
  */
 const updateUserProfile = asyncHandler(async (req, res) => {
-  console.log(req.user, 'req.user._id');
-
   let user = await User.findById(req.user._id);
 
   if (user) {
@@ -24,22 +22,16 @@ const updateUserProfile = asyncHandler(async (req, res) => {
       }
     }
 
-    console.log('0');
+    user.name = req.body.name || user.name;
+    user.email = req.body.email || user.email;
+    user.country = req.body.country || user.country;
 
-    user.name = req.user.name || user.name;
-    user.email = req.user.email || user.email;
-    user.country = req.user.country || user.country;
-
-    console.log('1');
     if (req.user.password) {
-      console.log('2');
       user.password = req.user.password;
     }
-    console.log('3');
 
     const updatedUser = await user.save();
     let token = await user.generateJWT();
-    console.log('4');
 
     res.json({
       success: true,
@@ -53,7 +45,6 @@ const updateUserProfile = asyncHandler(async (req, res) => {
       token: `Bearer ${token}`,
       message: 'Updated successfully.',
     });
-    console.log('5');
   } else {
     res.status(404).json({
       success: false,

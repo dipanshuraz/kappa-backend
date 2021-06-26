@@ -10,7 +10,6 @@ import mongoose from 'mongoose';
  */
 
 const createOrder = asyncHandler(async (req, res) => {
-  console.log(req.body, 'create order 1 ');
   const {
     orderItems,
     shippingAddress,
@@ -28,7 +27,6 @@ const createOrder = asyncHandler(async (req, res) => {
       .status(400)
       .json({ message: 'No order items', success: false, data: [] });
   } else {
-    console.log('0');
     const order = new Order({
       orderItems,
       user: req.user._id,
@@ -54,9 +52,6 @@ const createOrder = asyncHandler(async (req, res) => {
     let cart = await Cart.findOneAndDelete({
       user: req.user._id,
     });
-    console.log('2');
-
-    console.log(cart, 'cart is deleted');
 
     res.status(201).json({ success: true, data: orders });
   }
@@ -166,7 +161,21 @@ const getOrders = asyncHandler(async (req, res) => {
 });
 
 const getMyOrders = asyncHandler(async (req, res) => {
-  res.status(200).json({ data: res.advancedResults });
+  const order = await Order.find({ user: req.user._id }).populate({
+    path: 'orderItems.product',
+    populate: {
+      path: 'category',
+      model: 'Category',
+    },
+  });
+
+  if (order && order.length) {
+    res.status(200).json({ success: true, data: order });
+  } else {
+    res
+      .status(200)
+      .json({ success: true, data: [], message: 'Orders not found' });
+  }
 });
 
 export {

@@ -3,7 +3,6 @@ import { Product, Review } from '../models';
 import mongoose from 'mongoose';
 
 const getReviews = asyncHandler(async (req, res, next) => {
-  console.log(req.params, 'entry');
   if (req.params.productId) {
     const findProduct = await Product.findById(req.params.productId);
     if (!findProduct) {

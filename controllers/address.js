@@ -2,10 +2,10 @@ import { User } from '../models';
 import asyncHandler from 'express-async-handler';
 
 /**
- * @description Update user profile
- * @api /api/users/profile
+ * @description Get User address
+ * @api /api/users/address
  * @access Private
- * @type PUT
+ * @type GET
  */
 
 const getAddresses = asyncHandler(async (req, res) => {

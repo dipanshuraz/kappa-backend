@@ -9,22 +9,17 @@ const advancedResults = (model, populate) => async (req, res, next) => {
   // Fields to exclude
   const removeFields = ['select', 'sort', 'page', 'limit', 'search'];
 
-  console.log(reqQuery, 'reqQuery 00');
-
   // Loop over removeFields and delete them from reqQuery
   removeFields.forEach((param) => delete reqQuery[param]);
 
   // Create query string
   let queryStr = JSON.stringify(reqQuery);
-  console.log(queryStr, 'queryStr 0');
 
   // Create operators ($gt, $gte, etc)
   queryStr = queryStr.replace(
     /\b(gt|gte|lt|lte|in)\b/g,
     (match) => `$${match}`
   );
-
-  console.log(queryStr, 'queryStr');
 
   if (req.query.search) {
     const search = req.query.search
@@ -107,8 +102,6 @@ const advancedResults = (model, populate) => async (req, res, next) => {
   }
 
   let categoryName = await Category.findById(queryStr.category);
-
-  console.log(categoryName, 'categoryName');
 
   if (categoryName) {
     if (categoryName.active) {

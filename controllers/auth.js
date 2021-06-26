@@ -15,7 +15,6 @@ const registerUser = asyncHandler(async (req, res) => {
   let { email, password, name, country } = req.body;
 
   // Check if the user exists with that email
-  console.log(email, 'entry');
 
   let user = await User.findOne({ email });
 
@@ -99,7 +98,6 @@ const verifyUser = asyncHandler(async (req, res) => {
 
 const authenticateUser = asyncHandler(async (req, res) => {
   let { email, password, role } = req.body;
-  console.log(email, password, role, 'email, password, role ');
 
   email = email.toLowerCase();
   let user = await User.findOne({ email: email });
@@ -169,13 +167,9 @@ const authenticate = asyncHandler(async (req, res) => {
  */
 
 const resetPassword = asyncHandler(async (req, res) => {
-  console.log(req.body, 'req.body resetPassword');
-
   let { email } = req.body;
 
   let user = await User.findOne({ email });
-
-  console.log(user, 'user');
 
   if (!user) {
     return res.status(200).json({
@@ -184,8 +178,6 @@ const resetPassword = asyncHandler(async (req, res) => {
     });
   }
   let resetPassword = user.generatePasswordReset();
-
-  console.log(resetPassword, 'resetPassword');
 
   let result = await user.save();
 
@@ -203,11 +195,6 @@ const resetPassword = asyncHandler(async (req, res) => {
     'Reset Password',
     'Please reset your password.',
     html
-  );
-
-  console.log(
-    `${DOMAIN}resetPasswordNow/${user.resetPasswordToken}`,
-    'mail sent'
   );
 
   return res.status(200).json({
@@ -251,8 +238,6 @@ const resetPassword = asyncHandler(async (req, res) => {
  */
 
 const resetPasswordNow = asyncHandler(async (req, res) => {
-  console.log(req.body, 'req.body');
-
   let { resetPasswordToken, password } = req.body;
   let user = await User.findOne({
     resetPasswordToken,

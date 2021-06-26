@@ -66,9 +66,6 @@ const addCategory = asyncHandler(async (req, res, next) => {
  */
 
 const updateCategory = asyncHandler(async (req, res, next) => {
-  console.log(req.params.categoryId, 'req.params.categoryId');
-  console.log(req.body, 'body');
-
   const editCategory = await Category.findByIdAndUpdate(
     req.params.categoryId,
     req.body,
