@@ -6,7 +6,7 @@ name: CI
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
-    branches: [ master ]
+    branches: [master]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -17,9 +17,9 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-     - name: Notify slack
+      - name: Notify slack
     env:
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-    uses: pullreminders/slack-action@master
+    run: pullreminders/slack-action@master
     with:
       args: '{\"channel\":\"C025V24TQK1\",\"text\":\"Hello world\"}'
