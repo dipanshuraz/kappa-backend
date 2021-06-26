@@ -46,6 +46,4 @@ jobs:
           cat .env
 
       - run: npm i
-      - run: |
-          cd ~/kappa-backend/kappa-backend/kappa-backend
-          sudo -E pm2 restart BackendAPI
+      - run: pm2 start index.js --node-args="-r esm"
