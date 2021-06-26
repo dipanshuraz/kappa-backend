@@ -48,4 +48,4 @@ jobs:
       - run: npm i
       - run: |
           cd ~/kappa-backend/kappa-backend/kappa-backend
-          pm2 restart BackendAPI
+          sudo -E pm2 restart BackendAPI
