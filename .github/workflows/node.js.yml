@@ -46,4 +46,4 @@ jobs:
           cat .env
 
       - run: npm i
-      - run: pm2 restart kappaBackend
+      - run: pm2 restart kappaBackend --update-env
