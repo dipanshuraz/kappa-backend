@@ -12,7 +12,6 @@ import { DOMAIN, JWT_COOKIE_EXPIRE, NODE_ENV } from '../constants';
  */
 
 const registerUser = asyncHandler(async (req, res) => {
-  console.log(req.body, 'req.body');
   let { email, password, name, country } = req.body;
 
   // Check if the user exists with that email
