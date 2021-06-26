@@ -231,12 +231,12 @@ const createProduct = asyncHandler(async (req, res) => {
     ],
     (err) => {
       if (err) {
-        res.json({ success: false, err, data: null });
+        res.status(200).json({ success: false, err, data: null });
         return;
       }
 
       res.status(201).json({
-        success: false,
+        success: true,
         product: req.product,
         data: [],
       });
