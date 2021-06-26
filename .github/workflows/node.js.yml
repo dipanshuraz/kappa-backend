@@ -48,12 +48,6 @@ jobs:
       - run: npm i
       - run: pm2 start index.js --node-args="-r esm"
 
-  # This workflow contains a single job called "build"
-  slack:
-    # The type of runner that the job will run on
-    runs-on: self-hosted
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - name: Notify slack
         env:
