@@ -13,9 +13,15 @@ import {
   updateUser,
 } from '../controllers/user';
 
-router.route('/').get(advancedResults(User), getUsers);
+router
+  .route('/')
+  .get(userAuth, authorize('admin'), advancedResults(User), getUsers);
 
 router.route('/profile').put(userAuth, authorize('user'), updateUserProfile);
-router.route('/:id').delete(deleteUser).get(getUserById).put(updateUser);
+router
+  .route('/:id')
+  .delete(authorize('user'), deleteUser)
+  .get(getUserById)
+  .put(authorize('user'), updateUser);
 
 export default router;
