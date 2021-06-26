@@ -47,9 +47,6 @@ jobs:
 
       - run: npm i
       - run: pm2 start index.js --node-args="-r esm"
-
-    steps:
-      - name: Notify slack
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
         run: pullreminders/slack-action@master
