@@ -22,14 +22,27 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
-        env:
-          DATABASE_CLOUD: ${{ secrets.DATABASE_CLOUD }}
 
       - name: Create env file
         run: |
           touch .env
-          echo API_ENDPOINT="https://xxx.execute-api.us-west-2.amazonaws.com" >> .env
-          echo API_KEY=${{ secrets.API_KEY }} >> .env
+          echo NODE_ENV="production" >> .env
+          echo APP_NAME="APP SERVER" >> .env
+          echo APP_DOMAIN=${{ secrets.APP_DOMAIN }} >> .env
+          echo ADMIN_DOMAIN=${{ secrets.ADMIN_DOMAIN }} >> .env
+          echo PORT=${{ secrets.PORT }} >> .env
+          echo APP_PORT=${{ secrets.APP_PORT }} >> .env
+          echo CLIENT_URL=${{ secrets.CLIENT_URL }} >> .env
+          echo APP_SECRET=${{ secrets.APP_SECRET }} >> .env
+          echo DATABASE_CLOUD=${{ secrets.DATABASE_CLOUD }} >> .env
+          echo DATABASE_LOCAL=${{ secrets.DATABASE_LOCAL }} >> .env
+          echo SENDGRID_API_KEY=${{ secrets.SENDGRID_API_KEY }} >> .env
+          echo APP_HOST_EMAIL=${{ secrets.APP_HOST_EMAIL }} >> .env
+          echo AWS_BUCKET_NAME=${{ secrets.AWS_BUCKET_NAME }} >> .env
+          echo AWS_BUCKET_REGION=${{ secrets.AWS_BUCKET_REGION }} >> .env
+          echo AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }} >> .env
+          echo AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }} >> .env
+          echo JWT_COOKIE_EXPIRE=${{ secrets.JWT_COOKIE_EXPIRE }} >> .env
           cat .env
 
       - run: npm i
