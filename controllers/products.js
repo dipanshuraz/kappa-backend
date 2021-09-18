@@ -1,10 +1,10 @@
-import asyncHandler from 'express-async-handler';
-import { Product, Order, Cart } from '../models';
-import mongoose from 'mongoose';
-import async from 'async';
-import fs from 'fs';
-import util from 'util';
-import { uploadFileS3, getFileStreamS3, deleteFileS3 } from '../config/s3';
+import asyncHandler from "express-async-handler";
+import { Product, Order, Cart } from "../models";
+import mongoose from "mongoose";
+import async from "async";
+import fs from "fs";
+import util from "util";
+import { uploadFileS3, getFileStreamS3, deleteFileS3 } from "../config/s3";
 const unlinkFile = util.promisify(fs.unlink);
 
 /**
@@ -15,6 +15,7 @@ const unlinkFile = util.promisify(fs.unlink);
  */
 
 const getProducts = asyncHandler(async (req, res) => {
+  console.log("enter 1");
   res.status(200).json(res.advancedResults);
 });
 
@@ -26,7 +27,7 @@ const getProducts = asyncHandler(async (req, res) => {
  */
 const getProductById = asyncHandler(async (req, res) => {
   const product = await Product.findOne({ _id: req.params.id }).populate(
-    'category'
+    "category"
   );
 
   if (product) {
@@ -34,7 +35,7 @@ const getProductById = asyncHandler(async (req, res) => {
   } else {
     res.status(200).json({
       success: false,
-      message: 'Product not found',
+      message: "Product not found",
       data: {},
     });
   }
@@ -133,13 +134,13 @@ const deleteProduct = asyncHandler(async (req, res) => {
     ],
     (err) => {
       if (err) {
-        res.json({ success: false, err, data: null, message: 'Error occured' });
+        res.json({ success: false, err, data: null, message: "Error occured" });
         return;
       }
 
       res.status(200).json({
         success: true,
-        message: 'Product removed',
+        message: "Product removed",
         data: [],
       });
     }
@@ -391,7 +392,7 @@ const createProductReview = asyncHandler(async (req, res) => {
 
     if (alreadyReviewed) {
       res.status(400);
-      throw new Error('Product already reviewed');
+      throw new Error("Product already reviewed");
     }
 
     const review = {
@@ -410,9 +411,9 @@ const createProductReview = asyncHandler(async (req, res) => {
       product.reviews.length;
 
     await product.save();
-    res.status(201).json({ success: true, message: 'Review added' });
+    res.status(201).json({ success: true, message: "Review added" });
   } else {
-    res.status(201).json({ success: false, message: 'Product not found' });
+    res.status(201).json({ success: false, message: "Product not found" });
   }
 });
 

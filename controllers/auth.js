@@ -1,8 +1,8 @@
-import { User } from '../models';
-import asyncHandler from 'express-async-handler';
-import { randomBytes } from 'crypto';
-import sendMail from '../functions/email-sender';
-import { DOMAIN, JWT_COOKIE_EXPIRE, NODE_ENV } from '../constants';
+import { User } from "../models";
+import asyncHandler from "express-async-handler";
+import { randomBytes } from "crypto";
+import sendMail from "../functions/email-sender";
+import { DOMAIN, JWT_COOKIE_EXPIRE, NODE_ENV } from "../constants";
 
 /**
  * @description To create a new user account
@@ -22,7 +22,7 @@ const registerUser = asyncHandler(async (req, res) => {
     return res.status(200).json({
       success: false,
       message:
-        'Email is already registered. Did you forget the password. Try resetting it.',
+        "Email is already registered. Did you forget the password. Try resetting it.",
     });
   }
 
@@ -31,7 +31,7 @@ const registerUser = asyncHandler(async (req, res) => {
     password,
     name,
     country,
-    verificationCode: randomBytes(20).toString('hex'),
+    verificationCode: randomBytes(20).toString("hex"),
   });
 
   await user.save();
@@ -46,15 +46,15 @@ const registerUser = asyncHandler(async (req, res) => {
 
   await sendMail(
     user.email,
-    'Verify Account',
-    'Please verify Your Account.',
+    "Verify Account",
+    "Please verify Your Account.",
     html
   );
 
   return res.status(201).json({
     success: true,
     message:
-      'Hurray! your account is created please verify your email address.',
+      "Hurray! your account is created please verify your email address.",
   });
 });
 
@@ -71,7 +71,7 @@ const verifyUser = asyncHandler(async (req, res) => {
 
   if (!user) {
     return res.status(401).json({
-      message: 'Unauthorized access. Invalid verification code',
+      message: "Unauthorized access. Invalid verification code",
       success: false,
     });
   }
@@ -85,7 +85,7 @@ const verifyUser = asyncHandler(async (req, res) => {
   // );
   return res.status(200).json({
     success: true,
-    message: 'Hurray! your account is successfully verified.',
+    message: "Hurray! your account is successfully verified.",
   });
 });
 
@@ -105,21 +105,21 @@ const authenticateUser = asyncHandler(async (req, res) => {
   if (!user) {
     return res.status(404).json({
       success: false,
-      message: 'User not found.',
+      message: "User not found.",
     });
   }
 
   if (user.role !== role) {
     return res.status(200).json({
       success: false,
-      message: 'Incorrect Details.',
+      message: "Incorrect Details.",
     });
   }
 
   if (!(await user.comparePassword(password))) {
     return res.status(200).json({
       success: false,
-      message: 'Incorrect password.',
+      message: "Incorrect password.",
     });
   }
 
@@ -130,18 +130,18 @@ const authenticateUser = asyncHandler(async (req, res) => {
     httpOnly: true,
   };
 
-  if (NODE_ENV === 'production') {
+  if (NODE_ENV === "production") {
     options.secure = true;
   }
 
   return res
     .status(200)
-    .cookie('token', `Bearer ${token}`, options)
+    .cookie("token", `Bearer ${token}`, options)
     .json({
       success: true,
       user: user.getUserInfo(),
       token: `Bearer ${token}`,
-      message: 'Hurray! You are now logged in.',
+      message: "Hurray! You are now logged in.",
     });
 });
 
@@ -174,7 +174,7 @@ const resetPassword = asyncHandler(async (req, res) => {
   if (!user) {
     return res.status(200).json({
       success: false,
-      message: 'User with the email is not found.',
+      message: "User with the email is not found.",
     });
   }
   let resetPassword = user.generatePasswordReset();
@@ -192,14 +192,14 @@ const resetPassword = asyncHandler(async (req, res) => {
 
   await sendMail(
     user.email,
-    'Reset Password',
-    'Please reset your password.',
+    "Reset Password",
+    "Please reset your password.",
     html
   );
 
   return res.status(200).json({
     success: true,
-    message: 'Password reset link is sent your email.',
+    message: "Password reset link is sent your email.",
   });
 });
 
@@ -246,7 +246,7 @@ const resetPasswordNow = asyncHandler(async (req, res) => {
   if (!user) {
     return res.status(401).json({
       success: false,
-      message: 'Password reset token is invalid or has expired.',
+      message: "Password reset token is invalid or has expired.",
     });
   }
   user.password = password;
@@ -263,14 +263,14 @@ const resetPasswordNow = asyncHandler(async (req, res) => {
       `;
   await sendMail(
     user.email,
-    'Reset Password Successful',
-    'Your password is changed.',
+    "Reset Password Successful",
+    "Your password is changed.",
     html
   );
   return res.status(200).json({
     success: true,
     message:
-      'Your password reset request is complete and your password is reset successfully. Login into your account with your new password.',
+      "Your password reset request is complete and your password is reset successfully. Login into your account with your new password.",
   });
 });
 
